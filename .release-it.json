@@ -1,0 +1,24 @@
+{
+    "git": {
+        "tagName": "v${version}",
+        "commitMessage": "chore(release): v${version}",
+        "requireBranch": "master",
+        "changelog": "pnpm exec auto-changelog --stdout --commit-limit false --unreleased --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs"
+    },
+    "changelogFile": "CHANGELOG.md",
+    "github": {
+        "release": true,
+        "releaseName": "ViteShell v${version}",
+        "releaseNotes": "git log --pretty=format:'* %s %h' master...HEAD --no-merges",
+        "assets": ["dist/"],
+        "comments": true
+    },
+    "npm": {
+        "publish": true,
+        "skipChecks": true
+    },
+    "hooks": {
+        "before:init": "git fetch --tags",
+        "after:bump": "pnpm exec auto-changelog -p"
+    }
+}
