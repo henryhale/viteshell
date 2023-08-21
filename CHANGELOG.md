@@ -1,4 +1,21 @@
-### Changelog
+# Changelog
+
+# [0.4.0](https://github.com/henryhale/viteshell/compare/v0.0.8...v0.4.0) (2023-08-21)
+
+
+### Bug Fixes
+
+* capture parsing errors, implement onexit ([ed2bdc8](https://github.com/henryhale/viteshell/commit/ed2bdc849cfd6c07a64a7f7f8ca8d8064ac10ac1))
+* **release:** fix a bug in npm ([33dc1cd](https://github.com/henryhale/viteshell/commit/33dc1cd39909886d202bc614772f897456aa27f9))
+* **release:** publish next release over the previous one ([6a5eb81](https://github.com/henryhale/viteshell/commit/6a5eb81afe18ff1329d4dbc8c33bf2c5db306feb))
+* write raw input without variable substitution ([a2c1178](https://github.com/henryhale/viteshell/commit/a2c11785c4aa107f17af283238d623c7ddd9ab69))
+
+
+### Features
+
+* added onexit hook ([8b27f08](https://github.com/henryhale/viteshell/commit/8b27f0846235d065655cdacc166d671e827386ab))
+
+##
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
