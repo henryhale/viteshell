@@ -264,6 +264,11 @@ declare class ViteShell {
     public onclear: () => void;
 
     /**
+     * Sets a function invoked when the `exit` command is run
+     */
+    public onexit: () => void;
+
+    /**
      * Adds a new command to the shell's bin box
      * @param name The name of the command
      * @param config The configuration of the command
