@@ -302,18 +302,13 @@ declare class ViteShell {
     public setExecutionTimeout(value: number): void;
 
     /**
-     * Check if the shell is busy waiting for user input
-     */
-    readonly isBusy: boolean;
-
-    /**
      * Extracts a line from the input stream and executes it.
      *
      * If a command requires input, the input stream becomes busy until input is
      * made available via `shell.insert` method, until then this method can then
      * be invoked again for another input
      */
-    public execute(): Promise<number | void>;
+    public execute(line?: string): Promise<void>;
 
     /**
      * Aborts the current process or executing command
