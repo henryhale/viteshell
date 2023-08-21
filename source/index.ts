@@ -151,13 +151,13 @@ export default class ViteShell implements Shell {
         }
 
         if (this.#input.isBusy) {
+            this.#output.write(`${line || ""}\n`, "data", false);
             this.#input.insert(line);
             return;
         }
 
-        this.#output.reset();
-
-        if (typeof line === "undefined" || !line.trim()) {
+        if (typeof line !== "string" || !line.trim()) {
+            this.#output.write(`${line || ""}\n`, "data", false);
             this.#output.write(this.env[PROMPT_STYLE_ID]);
             return;
         }
@@ -166,7 +166,7 @@ export default class ViteShell implements Shell {
         let input = line.trim();
 
         // write the input to the output stream
-        this.#output.write(input);
+        this.#output.write(input + "\n", "data", false);
 
         // add input to history
         if (input != this.history.at(-1)) {

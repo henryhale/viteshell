@@ -120,7 +120,7 @@ export interface OutputStreamInterface {
     onerror?: OutputHandler;
     onclear?: () => void;
     beforeOutput?: (data: string) => string;
-    write(data: OutputData, type?: OutputType): void;
+    write(data: OutputData, type?: OutputType, replace?: boolean): void;
     error(msg: OutputData): void;
     clear(): void;
     flush(): void;
@@ -318,7 +318,7 @@ declare class ViteShell {
     /**
      * Aborts the current process or executing command
      */
-    abort(reason?: unknown): void;
+    public abort(reason?: unknown): void;
 
     // public executeScript(script: string): Promise<void>;
 
