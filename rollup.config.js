@@ -2,6 +2,8 @@ import { copyFileSync, readFileSync } from 'node:fs';
 import terser from '@rollup/plugin-terser';
 import babel from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
 
@@ -25,7 +27,7 @@ function copyToDist() {
             console.log(`[Y]: copied license to dist/`);
             copyFileSync('./package.json', './dist/package.json');
             console.log(`[Y]: copied package.json to dist/`);
-            copyFileSync('./types/viteshell.d.ts', './dist/viteshell.d.ts');
+            copyFileSync('./source/interface.ts', './dist/viteshell.d.ts');
             console.log(`[Y]: copied typings to dist/`);
         },
     };
@@ -42,6 +44,8 @@ export default [
         },
         plugins: [
             replacer,
+            commonjs(),
+            resolve(),
             babel({ babelHelpers: 'bundled' }),
             terser(),
         ],
@@ -53,6 +57,12 @@ export default [
             format: 'esm',
             banner,
         },
-        plugins: [replacer, terser(), copyToDist()],
+        plugins: [
+            replacer, 
+            commonjs(),
+            resolve(),
+            terser(), 
+            copyToDist()
+        ],
     },
 ];

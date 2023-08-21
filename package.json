@@ -22,7 +22,7 @@
     "prepack": "pnpm build",
     "prepare": "husky install",
     "release": "release-it",
-    "test": "jest"
+    "test": "jest --detectOpenHandles"
   },
   "repository": {
     "type": "git",
@@ -52,6 +52,8 @@
     "@babel/core": "^7.22.10",
     "@babel/preset-env": "^7.22.10",
     "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^25.0.3",
+    "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-terser": "^0.4.3",
     "@types/jest": "^29.5.3",
