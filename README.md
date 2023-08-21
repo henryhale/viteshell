@@ -89,6 +89,7 @@ Below is a basic setup to connect the shell to that kind of channel.
 vsh.onoutput = (data) => { /* print data */ };
 vsh.onerror = (error) => { /* print error */ };
 vsh.onclear = () => { /* clear output display */ };
+vsh.onexit = () => { /* cleanup */ };
 ```
 
 ### Activating the shell
