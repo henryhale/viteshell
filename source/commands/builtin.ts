@@ -1,3 +1,4 @@
+import { version } from "../constants";
 import { matchVariable } from "../executor/command";
 import { ICommandConfig, ICommandLibrary, IState } from "../interface";
 
@@ -20,7 +21,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
     bin.set("pwd", {
         synopsis: "pwd",
         description: "Print current working directory.",
-        action: ({ stdout }) => stdout.write("\n$PWD")
+        action: ({ stdout }) => stdout.write("$PWD")
     });
 
     // echo
@@ -40,8 +41,9 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
         description: "Defines aliases for commands",
         action({ argv, stdout }) {
             if (!argv.length || argv.includes("-p")) {
+                stdout.write("Aliases:");
                 Object.entries(state.alias).forEach(([k, v]) => {
-                    stdout.write("\nalias " + k + "='" + v + "'");
+                    stdout.write("\n\talias " + k + "='" + v + "'");
                 });
             } else {
                 argv.forEach((v) => {
@@ -73,8 +75,17 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
         description: "Set shell variables by name and value",
         action({ argv, env, stdout }) {
             if (!argv.length || argv.includes("-p")) {
-                Object.entries(env).forEach(([k, v]) => {
-                    stdout.write("\nvar " + k + "\t" + v);
+                Object.entries(env).forEach(([k, v], i) => {
+                    if (i) stdout.write("\n");
+                    stdout.write(
+                        "var " +
+                            k +
+                            '="' +
+                            (v?.toString().includes("$")
+                                ? v.toString().split("").join("\\")
+                                : v) +
+                            '"'
+                    );
                 });
             } else {
                 argv.forEach((v) => {
@@ -118,11 +129,19 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
                 const { synopsis, description } = bin.get(
                     cmd
                 ) as ICommandConfig;
-                stdout.write(
-                    "\n" + cmd + ": " + synopsis + "\n\t" + description
-                );
+                stdout.write(cmd + ": " + synopsis + "\n\t" + description);
             } else {
-                bin.forEach((v) => stdout.write("\n" + v.synopsis));
+                stdout.write(
+                    `ViteShell, ${version} Help\n\nA list of all available commands\n\n`
+                );
+                const all = Array.from(bin.values()).map((v) => v.synopsis);
+                const longest = all.reduce((v, c) => {
+                    return v > c.length ? v : c.length;
+                }, 0);
+                all.sort((a, b) => (a > b ? 1 : -1)).forEach((v, i) => {
+                    stdout.write(v.padEnd(longest, " "));
+                    stdout.write(i % 2 ? "\n" : "\t");
+                });
             }
         }
     });
