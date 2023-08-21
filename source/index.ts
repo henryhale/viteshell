@@ -145,10 +145,6 @@ export default class ViteShell implements Shell {
         }
     }
 
-    public get isBusy(): boolean {
-        return this.#input.isBusy;
-    }
-
     public async execute(line?: string): Promise<void> {
         if (!this.#active) {
             return Promise.reject(SHELL_INACTIVE);
