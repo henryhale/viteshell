@@ -77,9 +77,6 @@ To use `viteshell`, first create a new instance
 const vsh = new ViteShell();
 ```
 
-Check out the documentation below: 
-<details>
-
 ### Input/Output Channels
 
 You might need a terminal interface for inputting and outputting textual commands. 
@@ -179,8 +176,6 @@ const backup = vsh.exportState(); // JSON string
 
 vsh.loadState(backup);
 ```
-
-</details>
 
 ## Browser Support
 
