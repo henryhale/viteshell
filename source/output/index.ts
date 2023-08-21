@@ -34,12 +34,16 @@ export default class OutputStream implements OutputStreamInterface {
         this.onclear?.call(undefined);
     }
 
-    public write(data: OutputData, type: OutputType = "data"): void {
+    public write(
+        data: OutputData,
+        type: OutputType = "data",
+        replace = true
+    ): void {
         if (!this.isActive) {
             return;
         }
         data = data?.toString();
-        if (this.beforeOutput) {
+        if (replace && this.beforeOutput) {
             data = this.beforeOutput(data);
         }
         if (this.bufferOutput) {
