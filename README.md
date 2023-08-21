@@ -1,7 +1,7 @@
 <div align="center">
 <h1>viteshell</h1>
 <p>A minimalistic shell implementation written in TypeScript.</p>
-<img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/henryhale/viteshell/npm-publish.yml">
+<img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/henryhale/viteshell/release.yml">
 <img alt="npm" src="https://img.shields.io/npm/v/viteshell">
 <img alt="GitHub release (latest SemVer)" src="https://img.shields.io/github/v/release/henryhale/viteshell">
 <img alt="npm bundle size" src="https://img.shields.io/bundlephobia/minzip/viteshell">
