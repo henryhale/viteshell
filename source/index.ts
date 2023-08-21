@@ -27,7 +27,8 @@ import {
     PROMPT_STYLE_ID,
     RANDOM_ID,
     SHELL_INACTIVE,
-    SHELL_NAME
+    SHELL_NAME,
+    version
 } from "./constants";
 import { isCommandValid } from "./commands/index";
 import { parseInputIntoCommands } from "./parser/index";
@@ -39,8 +40,6 @@ import {
     matchVariable
 } from "./executor/index";
 
-const version = "v" + "__VERSION__";
-
 export default class ViteShell implements Shell {
     #output: OutputStream;
     #input: InputStream;
@@ -49,6 +48,7 @@ export default class ViteShell implements Shell {
     #active: boolean;
     #abortSignal: AbortSignalToken;
     #timeout?: number;
+    #onexit?: () => void;
 
     constructor() {
         this.#output = new OutputStream();
@@ -58,6 +58,7 @@ export default class ViteShell implements Shell {
         this.#active = false;
         this.#abortSignal = new AbortSignalToken();
         this.#timeout = undefined;
+        this.#onexit = undefined;
 
         this.#output.beforeOutput = (data) => {
             return replaceEnvVariables(this.#state.env, data);
@@ -99,6 +100,14 @@ export default class ViteShell implements Shell {
             this.#output.onclear = handler;
         } else {
             throw new TypeError("Clear handler must be a function.");
+        }
+    }
+
+    public set onexit(handler: () => void) {
+        if (isFunction(handler)) {
+            this.#onexit = handler;
+        } else {
+            throw new Error("onexit handler must be a function.");
         }
     }
 
@@ -150,6 +159,9 @@ export default class ViteShell implements Shell {
             return Promise.reject(SHELL_INACTIVE);
         }
 
+        this.#output.reset();
+
+        // incase there's a currently executing command requiring user input
         if (this.#input.isBusy) {
             this.#output.write(`${line || ""}\n`, "data", false);
             this.#input.insert(line);
@@ -179,6 +191,7 @@ export default class ViteShell implements Shell {
             const [, key, value] = variable;
             this.env[key] = value.trim();
             this.env[EXIT_CODE_ID] = EXIT_SUCCESS;
+            this.#output.write(this.env[PROMPT_STYLE_ID]);
             return;
         }
 
@@ -245,6 +258,7 @@ export default class ViteShell implements Shell {
             createAbortablePromise(
                 this.#abortSignal,
                 async (resolve, reject) => {
+                    // error message
                     let errorMsg: string | undefined;
 
                     const execute = async (c: ParsedCommand, p: IProcess) => {
@@ -260,6 +274,12 @@ export default class ViteShell implements Shell {
                         if (!this.#bin.has(c.cmd)) {
                             errorMsg = "'" + c.cmd + "' " + COMMAND_NOT_FOUND;
                         } else {
+                            // check for `exit` command
+                            if (c.cmd === "exit") {
+                                errorMsg = PROCESS_TERMINATED;
+                                this.#onexit?.call(undefined);
+                                return;
+                            }
                             // update the process object
                             p.cmd = c.cmd;
                             p.argv = c.argv;
@@ -302,7 +322,14 @@ export default class ViteShell implements Shell {
                         }
                     };
 
-                    const commands = parseInputIntoCommands(input);
+                    let commands!: ParsedCommand[];
+                    // capture parsing errors if any
+                    try {
+                        commands = parseInputIntoCommands(input);
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
 
                     for (const command of commands) {
                         // prevent unnecessary runs
@@ -349,7 +376,7 @@ export default class ViteShell implements Shell {
                 // set exti status
                 this.env[EXIT_CODE_ID] = EXIT_FAILURE;
                 // print error
-                this.#output.error("\n$SHELL: " + error?.toString());
+                this.#output.error("$SHELL: " + error?.toString());
             })
             .finally(() => {
                 //  end the child process, just in case it hasn't been resolved yet
@@ -359,10 +386,10 @@ export default class ViteShell implements Shell {
                 // do the magic
                 this.env[RANDOM_ID] = randomInt();
                 // reset
+                this.#output.reset();
                 this.#output.beforeOutput = (data) => {
                     return replaceEnvVariables(this.#state.env, data);
                 };
-                this.#output.reset();
                 // write prompt again
                 this.#output.write(this.env[PROMPT_STYLE_ID]);
             });

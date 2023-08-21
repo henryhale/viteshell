@@ -1,4 +1,9 @@
 /**
+ * The version of the shell
+ */
+export const version = "v" + "__VERSION__";
+
+/**
  * The name of the shell
  *
  * _It is reflected in error messages_
