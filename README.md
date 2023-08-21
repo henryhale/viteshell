@@ -208,4 +208,3 @@ This will generate the production-ready distribution files in the `dist` directo
 Copyright (c) 2023 [Henry Hale](https://github.com/henryhale).
 
 Released under the [MIT License](https://github.com/henryhale/viteshell/blob/master/LICENSE.txt).
->>>>>>> ecbd1d6 (initial commit)
