@@ -17,8 +17,8 @@ export function createAbortablePromise(
     fn: ExecutableAction,
     timeout?: number
 ) {
-    const createTask = () =>
-        new Promise<unknown>((resolve, reject) => {
+    function createTask() {
+        return new Promise<unknown>((resolve, reject) => {
             signal.onAbort((reason) => reject(reason || PROCESS_ABORTED));
             try {
                 fn?.call(undefined, resolve, reject);
@@ -26,6 +26,7 @@ export function createAbortablePromise(
                 reject(error?.toString());
             }
         });
+    }
     if (!timeout) return createTask();
     let task!: Promise<unknown>;
     return Promise.race([

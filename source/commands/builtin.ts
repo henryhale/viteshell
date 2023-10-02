@@ -1,6 +1,6 @@
 import { version } from "../constants";
 import { matchVariable } from "../executor/command";
-import { ICommandConfig, ICommandLibrary, IState } from "../interface";
+import type { ICommandConfig, ICommandLibrary, IState } from "../interface";
 
 export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
     // exit
