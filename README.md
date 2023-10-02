@@ -34,7 +34,6 @@
 
 > **Note**: Currently, `viteshell` only provides a platform for handling some basic shell operations. Support for other functionalities like input/output redirection, shell scripts, complex shell expansion and job control is not provided.  
 
-
 ## Installation
 
 Install the module via [npm](https://npmjs.org/package/viteshell). Run the following command to add as a dependency.
@@ -113,7 +112,7 @@ vsh.addCommand('hello', {
         if (argv.length) {
             stdout.write(`Hello ${argv.join(' ')}.\nIt is your time to shine.\n`);
         } else {
-            stdout.write(`Opps!! I forgot your name.`);
+            stdout.write(`Opps!! I forgot your name.\n`);
         }
     }
 });
