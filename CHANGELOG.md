@@ -1,5 +1,13 @@
 # Changelog
 
+# [0.5.0](https://github.com/henryhale/viteshell/compare/v0.4.1...v0.5.0) (2023-10-03)
+
+
+### Features
+
+* added history stack to process object ([3cea59a](https://github.com/henryhale/viteshell/commit/3cea59a1bfc1e7f5e2c9a84b79171d13d9700a4d))
+* added prompt style 2, fixed typos ([0161ac9](https://github.com/henryhale/viteshell/commit/0161ac9ad8b888f6f574ecb21ee03af5e68669e1))
+
 ## [0.4.1](https://github.com/henryhale/viteshell/compare/v0.4.0...v0.4.1) (2023-08-21)
 
 # [0.4.0](https://github.com/henryhale/viteshell/compare/v0.0.8...v0.4.0) (2023-08-21)

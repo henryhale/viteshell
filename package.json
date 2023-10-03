@@ -1,6 +1,6 @@
 {
   "name": "viteshell",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "A minimalistic shell implementation written in TypeScript.",
   "main": "./dist/viteshell.umd.js",
   "module": "./dist/viteshell.esm.js",
