@@ -24,12 +24,17 @@ const defaultEnv = {
     /**
      * Current working directory
      */
-    PWD: "/",
+    CWD: "/",
 
     /**
-     * Prompt style
+     * Prompt style 1
      */
-    PS1: "\n$USERNAME@$HOSTNAME: $PWD " + DEFAULT_PROMPT_STYLE,
+    PS1: "$USERNAME@$HOSTNAME: $CWD " + DEFAULT_PROMPT_STYLE,
+
+    /**
+     * Prompt style 2
+     */
+    PS2: "> ",
 
     /**
      * Previous exit status

@@ -45,6 +45,7 @@ export type IEnv = {
     HOSTNAME: string;
     PWD: string;
     PS1: string;
+    PS2: string;
     "?": number;
     RANDOM: number;
     [key: string]: string | number | undefined;
