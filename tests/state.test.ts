@@ -32,7 +32,7 @@ describe("Environmental variables", () => {
             "[user@web] # "
         );
         expect(replaceEnvVariables(env, env["PS1"] + "")).toBe(
-            "\nuser@web: / $ "
+            "user@web: / $ "
         );
     });
 });

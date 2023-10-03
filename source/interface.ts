@@ -167,6 +167,11 @@ export type IProcess = {
     readonly stderr: StandardError;
 
     /**
+     * History
+     */
+    readonly history: string[];
+
+    /**
      * Terminate the process
      */
     exit(): void;

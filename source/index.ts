@@ -83,7 +83,7 @@ export default class ViteShell implements Shell {
         if (isFunction(handler)) {
             this.#output.onoutput = handler;
         } else {
-            throw new TypeError("Output handler must be a function.");
+            throw new TypeError("onoutput handler must be a function.");
         }
     }
 
@@ -91,7 +91,7 @@ export default class ViteShell implements Shell {
         if (isFunction(handler)) {
             this.#output.onerror = handler;
         } else {
-            throw new TypeError("Error handler must be a function.");
+            throw new TypeError("onerror handler must be a function.");
         }
     }
 
@@ -99,7 +99,7 @@ export default class ViteShell implements Shell {
         if (isFunction(handler)) {
             this.#output.onclear = handler;
         } else {
-            throw new TypeError("Clear handler must be a function.");
+            throw new TypeError("onclear handler must be a function.");
         }
     }
 
@@ -143,7 +143,7 @@ export default class ViteShell implements Shell {
         this.#output.reset();
         this.#output.clear();
         if (greeting) {
-            this.#output.write(greeting);
+            this.#output.write(greeting + "\n");
         }
         this.#output.write(this.env[PROMPT_STYLE_ID]);
     }
@@ -163,22 +163,17 @@ export default class ViteShell implements Shell {
 
         // incase there's a currently executing command requiring user input
         if (this.#input.isBusy) {
-            this.#output.write(`${line || ""}\n`, "data", false);
             this.#input.insert(line);
             return;
         }
 
         if (typeof line !== "string" || !line.trim()) {
-            this.#output.write(`${line || ""}\n`, "data", false);
             this.#output.write(this.env[PROMPT_STYLE_ID]);
             return;
         }
 
         // user input
         let input = line.trim();
-
-        // write the input to the output stream
-        this.#output.write(input + "\n", "data", false);
 
         // add input to history
         if (input != this.history.at(-1)) {
@@ -239,6 +234,9 @@ export default class ViteShell implements Shell {
             },
             get stderr() {
                 return stderr;
+            },
+            get history() {
+                return spawnedState.history;
             },
             exit: () => {
                 throw new Error(PROCESS_TERMINATED);
@@ -331,7 +329,7 @@ export default class ViteShell implements Shell {
                         return;
                     }
 
-                    for (const command of commands) {
+                    for await (const command of commands) {
                         // prevent unnecessary runs
                         if (child.isComplete) break;
                         try {
@@ -373,10 +371,10 @@ export default class ViteShell implements Shell {
                 this.#state.patch(spawnedState);
             })
             .catch((error) => {
-                // set exti status
+                // set exit status
                 this.env[EXIT_CODE_ID] = EXIT_FAILURE;
                 // print error
-                this.#output.error("$SHELL: " + error?.toString());
+                this.#output.error("$SHELL: " + error?.toString() + "\n");
             })
             .finally(() => {
                 //  end the child process, just in case it hasn't been resolved yet

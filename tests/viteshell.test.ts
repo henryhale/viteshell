@@ -130,7 +130,7 @@ describe("ViteShell", () => {
 
         // unknown command
         await shell.execute("blahblah").finally(() => {
-            expect(box).toHaveLength(4);
+            expect(box).toHaveLength(3);
             expect(box.at(-2)).toMatch(/command not found/g);
         });
         // exit status

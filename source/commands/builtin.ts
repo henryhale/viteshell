@@ -54,6 +54,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
                     }
                 });
             }
+            stdout.write("\n");
         }
     });
 
@@ -75,8 +76,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
         description: "Set shell variables by name and value",
         action({ argv, env, stdout }) {
             if (!argv.length || argv.includes("-p")) {
-                Object.entries(env).forEach(([k, v], i) => {
-                    if (i) stdout.write("\n");
+                Object.entries(env).forEach(([k, v]) => {
                     stdout.write(
                         "var " +
                             k +
@@ -84,7 +84,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
                             (v?.toString().includes("$")
                                 ? v.toString().split("").join("\\")
                                 : v) +
-                            '"'
+                            '"\n'
                     );
                 });
             } else {
@@ -103,14 +103,14 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
     bin.set("history", {
         synopsis: "history [-c] [-n]",
         description: "Retrieve previous input entries",
-        action: ({ argv, stdout }) => {
+        action: ({ argv, history, stdout }) => {
             if (argv.includes("-c")) {
-                state.history.splice(0);
+                history.splice(0);
             } else if (argv.includes("-n")) {
-                stdout.write(`\nHistory: ${state.history.length}`);
+                stdout.write(`History: ${history.length}\n`);
             } else {
-                state.history.forEach((v, i) => {
-                    stdout.write("\n " + i + " " + v);
+                history.forEach((v, i) => {
+                    stdout.write("  " + i + "\t" + v + "\n");
                 });
             }
         }
@@ -143,6 +143,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
                     stdout.write(i % 2 ? "\n" : "\t");
                 });
             }
+            stdout.write("\n");
         }
     });
 

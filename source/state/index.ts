@@ -32,6 +32,7 @@ export default class State implements IShellState {
     public patch(mutatedState: IState): void {
         Object.assign(this.alias, mutatedState.alias);
         Object.assign(this.env, mutatedState.env);
-        this.history.splice(0, 1, ...mutatedState.history);
+        this.history.splice(0);
+        this.history.push(...mutatedState.history);
     }
 }
