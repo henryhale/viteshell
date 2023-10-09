@@ -1,12 +1,13 @@
-import { version } from "../constants";
+import { VERSION } from "../constants";
 import { matchVariable } from "../executor/command";
-import type { ICommandConfig, ICommandLibrary, IState } from "../interface";
+import type { ICommandLibrary } from "../interface";
+import type { IState } from "../state";
 
 export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
     // exit
     bin.set("exit", {
         synopsis: "exit",
-        description: "Terminate current process",
+        description: "Terminate the current process",
         action: ({ exit }) => exit()
     });
 
@@ -29,7 +30,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
         synopsis: "echo [...args]",
         description:
             "Write arguments to the standard output followed by a new line character.",
-        action({ argv, stdout }) {
+        action: ({ argv, stdout }) => {
             argv.forEach((v) => stdout.write(v));
             stdout.write("\n");
         }
@@ -39,7 +40,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
     bin.set("alias", {
         synopsis: "alias [-p] [name=[value] ... ]",
         description: "Defines aliases for commands",
-        action({ argv, stdout }) {
+        action: ({ argv, stdout }) => {
             if (!argv.length || argv.includes("-p")) {
                 stdout.write("Aliases:");
                 Object.entries(state.alias).forEach(([k, v]) => {
@@ -60,9 +61,9 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
 
     // unalias
     bin.set("unalias", {
-        synopsis: "unalias [name=[value] ... ]",
+        synopsis: "unalias [name ... ]",
         description: "Removes aliases for commands",
-        action({ argv }) {
+        action: ({ argv }) => {
             if (!argv.length) return;
             argv.forEach((v) => {
                 delete state.alias[v];
@@ -74,7 +75,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
     bin.set("export", {
         synopsis: "export [name=[value] ... ]",
         description: "Set shell variables by name and value",
-        action({ argv, env, stdout }) {
+        action: ({ argv, env, stdout }) => {
             if (!argv.length || argv.includes("-p")) {
                 Object.entries(env).forEach(([k, v]) => {
                     stdout.write(
@@ -120,19 +121,17 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
     bin.set("help", {
         synopsis: "help",
         description: "Displays information on available commands.",
-        action({ argv, stdout }) {
+        action: ({ argv, stdout }) => {
             if (argv[0]) {
-                const cmd = argv[0];
-                if (!bin.has(cmd)) {
+                const cmd = bin.get(argv[0]);
+                if (!cmd) {
                     throw "help: no information matching '" + cmd + "'";
                 }
-                const { synopsis, description } = bin.get(
-                    cmd
-                ) as ICommandConfig;
+                const { synopsis, description } = cmd;
                 stdout.write(cmd + ": " + synopsis + "\n\t" + description);
             } else {
                 stdout.write(
-                    `ViteShell, ${version} Help\n\nA list of all available commands\n\n`
+                    `ViteShell, ${VERSION} Help\n\nA list of all available commands\n\n`
                 );
                 const all = Array.from(bin.values()).map((v) => v.synopsis);
                 const longest = all.reduce((v, c) => {
