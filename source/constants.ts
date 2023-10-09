@@ -1,7 +1,7 @@
 /**
  * The version of the shell
  */
-export const version = "v" + "__VERSION__";
+export const VERSION = "v" + "__VERSION__";
 
 /**
  * The name of the shell
@@ -18,12 +18,12 @@ export const SHELL_NAME_ID = "SHELL";
 /**
  * The exit code for successfully executed command
  */
-export const EXIT_SUCCESS = 0;
+export const EXIT_SUCCESS = "0";
 
 /**
  * The exit code for commands resulting into errors when executed
  */
-export const EXIT_FAILURE = 1;
+export const EXIT_FAILURE = "1";
 
 /**
  * The previous exit code identifier in the `env` object
@@ -73,3 +73,8 @@ export const RANDOM_ID = "RANDOM";
  */
 export const SHELL_INACTIVE =
     SHELL_NAME + ": inactive, use shell.init to activate";
+
+/**
+ * Minimum execution timeout
+ */
+export const MIN_TIMEOUT = 0;

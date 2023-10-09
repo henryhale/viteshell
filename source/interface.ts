@@ -5,40 +5,8 @@
  */
 
 /**
- * Result from parsing string input to argv object
+ * Environment Variables
  */
-export type ParserResult = {
-    /**
-     * Error caught while parsing
-     */
-    error?: Error;
-
-    /**
-     * Array of raw arguments
-     */
-    args: string[];
-};
-
-/**
- * A single command and its respective arguments after parsing the input
- */
-export type ParsedCommand = {
-    cmd: string;
-    argv: string[];
-    PIPE?: ParsedCommand;
-    AND?: ParsedCommand;
-    OR?: ParsedCommand;
-};
-
-/**
- * Storable State
- */
-export interface IState {
-    readonly env: IEnv;
-    readonly alias: IAlias;
-    readonly history: string[];
-}
-
 export type IEnv = {
     SHELL: string;
     USERNAME: string;
@@ -46,39 +14,23 @@ export type IEnv = {
     PWD: string;
     PS1: string;
     PS2: string;
-    "?": number;
-    RANDOM: number;
-    [key: string]: string | number | undefined;
-};
-
-export type IAlias = {
-    [key: string]: string | number | undefined;
+    "?": string;
+    RANDOM: string;
+    [key: string]: string | undefined;
 };
 
 /**
- * Shell State
+ * Aliases
  */
-export interface IShellState extends IState {
-    import(savedState: string): void;
-    toJSON(): string;
-    spawn(str?: string): IState;
-    patch(mutatedState: IState): void;
-}
+export type IAlias = {
+    [key: string]: string | undefined;
+};
 
 /**
  * STDIN interface
  */
 export interface StandardInput {
     readline(): Promise<string>;
-}
-
-/**
- * Input stream
- */
-export interface InputStreamInterface extends StandardInput {
-    readonly isBusy: boolean;
-    insert(data?: string): void;
-    clear(): void;
 }
 
 /**
@@ -112,25 +64,6 @@ export interface StandardOutput extends StandardError {
 }
 
 /**
- * Output stream
- */
-export interface OutputStreamInterface {
-    bufferOutput: boolean;
-    readonly extract: string[];
-    onoutput?: OutputHandler;
-    onerror?: OutputHandler;
-    onclear?: () => void;
-    beforeOutput?: (data: string) => string;
-    write(data: OutputData, type?: OutputType, replace?: boolean): void;
-    error(msg: OutputData): void;
-    clear(): void;
-    flush(): void;
-    enable(): void;
-    disable(): void;
-    reset(): void;
-}
-
-/**
  * Process object
  *
  * _Inspired by the `node:process` module_
@@ -142,7 +75,12 @@ export type IProcess = {
     cmd: string;
 
     /**
-     * Arguments to the command
+     * Raw arguments as a string
+     */
+    args: string;
+
+    /**
+     * Array of arguments to the command
      */
     argv: string[];
 
@@ -172,14 +110,9 @@ export type IProcess = {
     readonly history: string[];
 
     /**
-     * Terminate the process
+     * Shell version number
      */
-    exit(): void;
-
-    /**
-     * Before exit hook
-     */
-    onExit(cb: () => void): void;
+    readonly version: string;
 
     /**
      * Exit code for the previously executed command
@@ -187,9 +120,14 @@ export type IProcess = {
     readonly exitCode: number;
 
     /**
-     * Shell version number
+     * Terminate the process
      */
-    readonly version: string;
+    exit(code?: number | string): void;
+
+    /**
+     * Before exit hook
+     */
+    onExit(cb: (reason?: unknown) => void): void;
 };
 
 /**
@@ -209,7 +147,7 @@ export type ICommandConfig = {
     /**
      * Executable function of the command
      */
-    action(process: IProcess): void | number | Promise<void | number>;
+    action(process: IProcess): Promise<void> | void;
 };
 
 /**
@@ -270,11 +208,6 @@ declare class ViteShell {
     public onclear: () => void;
 
     /**
-     * Sets a function invoked when the `exit` command is run
-     */
-    public onexit: () => void;
-
-    /**
      * Adds a new command to the shell's bin box
      * @param name The name of the command
      * @param config The configuration of the command
@@ -295,9 +228,9 @@ declare class ViteShell {
     /**
      * Restores the shell state using a backup generated using `shell.exportState`
      * method
-     * @param str shell state backup as JSON string
+     * @param json shell state backup as JSON string
      */
-    public loadState(str: string): void;
+    public loadState(json: string): void;
 
     /**
      * Initializes the shell with a greeting and display the prompt

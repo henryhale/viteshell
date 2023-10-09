@@ -1,37 +1,47 @@
 import { isFunction } from "../helpers";
 
+export type IAbortSignal = {
+    isAborted: boolean;
+    abort: (reason?: unknown) => void;
+    onAbort: (handler: (reason?: unknown) => void) => void;
+    reset: () => void;
+};
+
 /**
- * AbortSignalToken
+ * AbortSignal
  *
- * Inspired by the AbortController & AbortSignal
+ * Inspired by the window.AbortController & window.AbortSignal
  */
-export class AbortSignalToken {
-    private handlers: Set<(reason?: unknown) => void>;
-    private isCancelled: boolean;
+export function createAbortSignal(): IAbortSignal {
+    const handlers = new Set<(msg?: unknown) => void>();
+    let aborted = false;
 
-    constructor() {
-        this.handlers = new Set();
-        this.isCancelled = false;
-    }
-
-    public onAbort(handler: (reason?: unknown) => void): void {
+    function onAbort(handler: (reason?: unknown) => void): void {
         if (!isFunction(handler)) return;
-        if (this.isCancelled) {
+        if (aborted) {
             handler.call(undefined);
         } else {
-            this.handlers.add(handler);
+            handlers.add(handler);
         }
     }
 
-    public abort(reason?: unknown): void {
-        if (this.isCancelled) return;
-        this.isCancelled = true;
-        this.handlers.forEach((fn) => fn.call(undefined, reason));
-        this.handlers.clear();
+    function abort(reason?: unknown): void {
+        if (aborted) return;
+        aborted = true;
+        handlers.forEach((fn) => fn.call(undefined, reason));
     }
 
-    public reset(): void {
-        this.isCancelled = false;
-        if (this.handlers.size) this.handlers.clear();
+    function reset(): void {
+        aborted = false;
+        if (handlers.size) handlers.clear();
     }
+
+    return {
+        abort,
+        onAbort,
+        reset,
+        get isAborted() {
+            return aborted;
+        }
+    };
 }

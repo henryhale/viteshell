@@ -44,14 +44,14 @@ const defaultEnv = {
     /**
      * Random number
      */
-    RANDOM: randomInt()
+    RANDOM: "" + randomInt()
 };
 
 /**
  * Create a new environment object with default variables
  * @returns Env
  */
-export function defineEnv() {
+export function defineEnv(): IEnv {
     return Object.assign(Object.create(null), defaultEnv);
 }
 
