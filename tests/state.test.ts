@@ -1,6 +1,11 @@
 import { IEnv } from "../source/interface";
 import { defineEnv, replaceEnvVariables } from "../source/state/env";
-import ShellState from "../source/state/index";
+import {
+    type IState,
+    defineState,
+    spawnState,
+    patchState
+} from "../source/state";
 
 describe("Environmental variables", () => {
     let env: IEnv;
@@ -16,10 +21,10 @@ describe("Environmental variables", () => {
 
     test("variable management", () => {
         expect(env["TEST"]).toBeUndefined();
-        env["TEST"] = 123;
+        env["TEST"] = "123";
         expect(env["TEST"]).toBeDefined();
-        env["TEST"] = 456;
-        expect(env["TEST"]).toEqual(456);
+        env["TEST"] = "456";
+        expect(env["TEST"]).toEqual("456");
         delete env["TEST"];
         expect(env["TEST"]).toBeUndefined();
     });
@@ -38,10 +43,10 @@ describe("Environmental variables", () => {
 });
 
 describe("Shell state", () => {
-    let state: ShellState;
+    let state!: IState;
 
     beforeEach(() => {
-        state = new ShellState();
+        state = defineState();
     });
 
     test("initialization", () => {
@@ -57,27 +62,25 @@ describe("Shell state", () => {
 
     test("state management", () => {
         state.history.push("help");
-        state.env["SESSION_ID"] = 123456;
+        state.env["SESSION_ID"] = "123456";
         state.alias["info"] = "help";
 
         expect(state.history).toHaveLength(1);
         expect(Object.keys(state.alias)).toHaveLength(1);
 
-        expect(state.toJSON()).toBeDefined();
+        const spawnedState = spawnState(state);
 
-        expect(state.spawn()).toEqual(state);
-
-        const spawnedState = state.spawn();
+        expect(spawnedState).toEqual(state);
 
         spawnedState.alias["man"] = "help";
         spawnedState.history.push("clear");
 
         expect(spawnedState).not.toEqual(state);
 
-        state.patch(spawnedState);
+        patchState(state, spawnedState);
 
         expect(state).toEqual(spawnedState);
-        expect(state.alias.size).toEqual(spawnedState.alias.size);
+        expect(state.alias).toEqual(spawnedState.alias);
         expect(state.history).toHaveLength(spawnedState.history.length);
     });
 });
