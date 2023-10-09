@@ -1,7 +1,10 @@
 import { isFunction } from "../helpers";
-import type { InputStreamInterface } from "../interface";
+import type { StandardInput } from "../interface";
 
-export default class InputStream implements InputStreamInterface {
+/**
+ * Input stream
+ */
+export default class InputStream implements StandardInput {
     private readonly buffer: string[];
     private extractor?: () => void;
 
