@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.2](https://github.com/henryhale/viteshell/compare/v0.6.1...v0.6.2) (2023-12-08)
+
+
+### Bug Fixes
+
+* **bug:** command execution terminated immediately ([c546331](https://github.com/henryhale/viteshell/commit/c546331c457734c0b12b4885220c508ee5cd6b73))
+* **bug:** concatenated execution error in compound commands ([e7a7326](https://github.com/henryhale/viteshell/commit/e7a732694b06d28097bb02656101176e995a1c11))
+
 ## [0.6.1](https://github.com/henryhale/viteshell/compare/v0.6.0...v0.6.1) (2023-12-08)
 
 
