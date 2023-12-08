@@ -8,7 +8,6 @@
     "github": {
         "release": true,
         "releaseName": "ViteShell v${version}",
-        "releaseNotes": "git log --pretty=format:'* %s %h' master...HEAD --no-merges",
         "assets": ["dist/"],
         "comments": true
     },
