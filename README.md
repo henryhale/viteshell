@@ -53,6 +53,8 @@ To get started with development, follow these steps:
 1. Clone this repository: `git clone https://github.com/henryhale/viteshell.git`
 2. Navigate to the project directory: `cd viteshell`
 3. Install dependencies: `pnpm install`
+4. Development: `pnpm dev`
+5. Run tests using: `pnpm test`
 
 ### Building the Library
 
