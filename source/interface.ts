@@ -239,8 +239,6 @@ declare class ViteShell {
     public init(greeting?: string): void;
 
     /**
-     * _[experimental]_
-     *
      * Set command execution timeout beyond which the process is terminated
      */
     public setExecutionTimeout(value: number): void;
