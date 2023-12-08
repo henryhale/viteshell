@@ -1,7 +1,7 @@
 import { EXIT_CODE_ID, PROCESS_TERMINATED, VERSION } from "../constants";
 import { toNumber } from "../helpers";
 import type { IProcess } from "../interface";
-import { spawnState, type IState } from "../state";
+import type { IState } from "../state";
 import { replaceEnvVariables } from "../state/env";
 import InputStream from "../streams/input";
 import OutputStream from "../streams/output";
@@ -13,8 +13,6 @@ export function createProcessContext(
     output: OutputStream,
     signal: IAbortSignal
 ): IProcess {
-    state = spawnState(state);
-
     let done = false;
 
     const stdin = {
@@ -40,7 +38,9 @@ export function createProcessContext(
         cmd: "",
         args: "",
         argv: [],
-        env: state.env,
+        get env() {
+            return state.env;
+        },
         get stderr() {
             return stderr;
         },

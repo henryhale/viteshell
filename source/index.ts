@@ -29,6 +29,8 @@ import { isCommandValid } from "./commands";
 import { addBuiltinCommands } from "./commands/builtin";
 import { parseInputIntoCommands } from "./parser";
 import type { ParsedCommand } from "./parser/parse";
+import { findNextCommand, createProcessContext } from "./executor";
+import { defineState, spawnState, type IState, patchState } from "./state";
 import {
     type IAbortSignal,
     createAbortSignal,
@@ -175,23 +177,35 @@ export default class ViteShell implements Shell {
         // whether to buffer the output or not
         this.#output.bufferOutput = c.PIPE !== undefined;
 
+        // error message;
+        let errorMsg = "";
+
         try {
             // execute command handler
             await command.action.call(undefined, p);
-            p.env[EXIT_CODE_ID] = EXIT_SUCCESS;
+            // extract previous output for piped command
             if (c.PIPE) {
                 c.PIPE.argv.push(...this.#output.extract);
                 await this.#execvp(c.PIPE, p);
             }
         } catch (error) {
-            p.env[EXIT_CODE_ID] = EXIT_FAILURE;
-            if (error) p.stderr.write("" + error);
-        } finally {
-            if (c.OR || c.AND) {
-                const status = p.env[EXIT_CODE_ID] === EXIT_SUCCESS;
-                const nxt = findNextCommand(c, status);
-                if (nxt) await this.#execvp(nxt, p);
+            errorMsg = c.cmd + ": " + error;
+        }
+
+        // look for next executable command in the chain basing on exit status
+        if (c.OR || c.AND) {
+            const nxt = findNextCommand(c, !errorMsg.length);
+            if (nxt) {
+                if (errorMsg.length) {
+                    p.stderr.writeln(errorMsg);
+                    errorMsg = "";
+                }
+                await this.#execvp(nxt, p);
             }
+        }
+
+        if (errorMsg.length) {
+            throw errorMsg;
         }
     }
 
@@ -247,6 +261,8 @@ export default class ViteShell implements Shell {
                         try {
                             // execute command
                             await this.#execvp(command, process);
+                            // update exit status
+                            spawnedState.env[EXIT_CODE_ID] = EXIT_SUCCESS;
                             // update shell state
                             patchState(this.#state, spawnedState);
                         } catch (error) {
@@ -267,7 +283,8 @@ export default class ViteShell implements Shell {
             this.#timeout
         )
             .catch((error) => {
-                this.#output.error("\n" + error);
+                // print error
+                this.#output.error(error + "\n");
                 this.#state.env[EXIT_CODE_ID] = EXIT_FAILURE;
             })
             .finally(() => {
