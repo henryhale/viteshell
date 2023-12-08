@@ -22,7 +22,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
     bin.set("pwd", {
         synopsis: "pwd",
         description: "Print current working directory.",
-        action: ({ stdout }) => stdout.write("$CWD\n")
+        action: ({ stdout }) => stdout.writeln("$CWD")
     });
 
     // echo
@@ -30,10 +30,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
         synopsis: "echo [...args]",
         description:
             "Write arguments to the standard output followed by a new line character.",
-        action: ({ argv, stdout }) => {
-            argv.forEach((v) => stdout.write(v));
-            stdout.write("\n");
-        }
+        action: ({ argv, stdout }) => stdout.writeln(argv.join(" "))
     });
 
     // alias
@@ -108,10 +105,10 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
             if (argv.includes("-c")) {
                 history.splice(0);
             } else if (argv.includes("-n")) {
-                stdout.write(`History: ${history.length}\n`);
+                stdout.writeln(`History: ${history.length}`);
             } else {
                 history.forEach((v, i) => {
-                    stdout.write("  " + i + "\t" + v + "\n");
+                    stdout.writeln("  " + i + "\t" + v);
                 });
             }
         }
