@@ -128,21 +128,18 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
                     throw "help: no information matching '" + cmdName + "'";
                 }
                 const { synopsis, description } = cmd;
-                stdout.write(cmdName + ": " + synopsis + "\n\t" + description);
+                stdout.writeln(
+                    cmdName + ": " + synopsis + "\n\t" + description
+                );
             } else {
                 stdout.write(
                     `ViteShell, ${VERSION} Help\n\nA list of all available commands\n\n`
                 );
-                const all = Array.from(bin.values()).map((v) => v.synopsis);
-                const longest = all.reduce((v, c) => {
-                    return v > c.length ? v : c.length;
-                }, 0);
-                all.sort((a, b) => (a > b ? 1 : -1)).forEach((v, i) => {
-                    stdout.write(v.padEnd(longest, " "));
-                    stdout.write(i % 2 ? "\n" : "\t");
-                });
+                Array.from(bin.values())
+                    .map((v) => v.synopsis)
+                    .sort()
+                    .forEach((v) => stdout.writeln(v));
             }
-            stdout.write("\n");
         }
     });
     state.alias["info"] = "help";
