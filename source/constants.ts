@@ -44,18 +44,18 @@ export const DEFAULT_PROMPT_STYLE = "$ ";
 /**
  * Error message if the process is aborted
  */
-export const PROCESS_ABORTED = "Process aborted!";
+export const PROCESS_ABORTED = SHELL_NAME + ": process aborted!";
 
 /**
  * Error message if the process is aborted
  */
-export const PROCESS_TIMED_OUT = "Process timed out!";
+export const PROCESS_TIMED_OUT = SHELL_NAME + ": process timed out!";
 
 /**
  * Error message if the command execution is voluntarily
  * terminated
  */
-export const PROCESS_TERMINATED = "Process terminated!";
+export const PROCESS_TERMINATED = SHELL_NAME + ": process terminated!";
 
 /**
  * Error message if the command to execute does not exist
@@ -72,7 +72,7 @@ export const RANDOM_ID = "RANDOM";
  * Error message if the shell is inactive
  */
 export const SHELL_INACTIVE =
-    SHELL_NAME + ": inactive, use shell.init to activate";
+    SHELL_NAME + ": inactive, use shell.init() to activate";
 
 /**
  * Minimum execution timeout
