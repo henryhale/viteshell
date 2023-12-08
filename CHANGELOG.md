@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/henryhale/viteshell/compare/v0.6.0...v0.6.1) (2023-12-08)
+
+
+### Bug Fixes
+
+* onexit method not found ([987f27d](https://github.com/henryhale/viteshell/commit/987f27dcfd80820e39af35e006967ee5fb9c4539))
+
 # [0.6.0](https://github.com/henryhale/viteshell/compare/v0.5.0...v0.6.0) (2023-12-08)
 
 
