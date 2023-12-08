@@ -67,7 +67,7 @@ export default class OutputStream {
     }
 
     public reset() {
-        this.enable();
         this.flush();
+        this.enable();
     }
 }
