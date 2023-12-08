@@ -180,33 +180,55 @@ A combination of several simple commands separated by the shell's special charac
 
     _echo [args]_ - Write arguments to the standard output followed by a new line character.
 
+    Example: `echo "Hello $USERNAME!"`
+
 -   alias
 
     _alias [-p] [name=[value] ...]_ - Defines aliases for commands
+
+    Example: `alias -p` to display all aliases, `alias println=echo` to use `println` as `echo`
 
 -   unalias
 
     _unalias [name ...]_ - Removes aliases for commands
 
+    Example: `unalias println` to remove the `println` alias
+
 -   export
 
     _export [-p] [name=[value] ... ]_ - Set shell variables by name and value
+
+    Example: `export -p` to display all variables, `export ANSWER=123` to assign `123` to `ANSWER` variable  
 
 -   history
 
     _history [-c] [-n]_ - Retrieve previous input entries
 
+    Example: `history -c` to clear the history list, `history -n` to display the number of items in the history list  
+
 -   help
 
     _help [command]_ - Displays information on available commands.
+
+    Example: `help` to display all commands,  `help clear` to show a manual of the `clear` command 
 
 -   read
 
     _read [prompt] [variable]_ - Capture input and save it in the env object
 
+    Example: `read "Do you want to continue? (y/n) " ANSWER` to prompt user `Do you want to continue? (y/n) ` and save the user response in the `ANSWER` variable
+
 -   sleep
 
     _sleep [seconds]_ - Delay for a specified amount of time (in seconds).
+
+    Example: `sleep 3` to pause the shell for `3` seconds 
+
+-   grep
+
+    _grep [keyword] [context ...]_ - Searches for matching phrases in the text
+
+    Example: `help | grep clear` to capture all occurences of `clear` in the output of the `help` command 
 
 </dialog>
 

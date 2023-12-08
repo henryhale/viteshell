@@ -176,4 +176,23 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
             );
         }
     });
+
+    // grep
+    bin.set("grep", {
+        synopsis: "grep [keyword] [context ...]",
+        description: "Searches for matching phrases in the text",
+        action: async ({ argv, stdout }) => {
+            if (argv.length < 2) {
+                throw "invalid arguments";
+            }
+            const reg = new RegExp(argv[0], "g");
+            argv.slice(1).forEach((x) => {
+                if (reg.test(x)) {
+                    stdout.writeln(
+                        x.replaceAll(argv[0], (m) => "**" + m + "**")
+                    );
+                }
+            });
+        }
+    });
 }
