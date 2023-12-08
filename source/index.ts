@@ -98,7 +98,9 @@ export default class ViteShell implements Shell {
 
     public addCommand(name: ICommandName, config: ICommandConfig): void {
         if (this.#bin.has(name)) {
-            throw new Error(`${SHELL_NAME}: '${name}' command already exists`);
+            throw new Error(
+                `${SHELL_NAME}: '${name}' command already exists. If you are providing a custom command implementation, remove the command first.`
+            );
         }
 
         if (!isCommandValid(config)) {
@@ -210,10 +212,12 @@ export default class ViteShell implements Shell {
     }
 
     public async execute(line: string = ""): Promise<void> {
+        // check if shell is initialized
         if (!this.#active) {
             return Promise.reject(SHELL_INACTIVE);
         }
 
+        // flush the output stream and then activate it
         this.#output.reset();
 
         // incase there's a currently executing command requiring user input
@@ -222,6 +226,7 @@ export default class ViteShell implements Shell {
             return Promise.resolve();
         }
 
+        // check if the line contains characters
         if (typeof line !== "string" || !line.trim()) {
             this.#prompt();
             return Promise.resolve();
@@ -229,7 +234,7 @@ export default class ViteShell implements Shell {
 
         line = line.trim();
 
-        // add input to history
+        // add input to history, no consecutive duplicates
         if (line != this.history.at(-1)) {
             this.history.push(line);
         }
@@ -248,6 +253,7 @@ export default class ViteShell implements Shell {
             this.#abortSignal
         );
 
+        // run child process in parallel with abort signal listener and timeout handler
         return await createAbortablePromise<void>(
             this.#abortSignal,
             async (resolve, reject) => {
@@ -268,15 +274,18 @@ export default class ViteShell implements Shell {
                         } catch (error) {
                             if (commands.length > 1) {
                                 // only print error and continue to the next command
-                                process.stderr.write("\n" + error);
+                                process.stderr.write(error + "\n");
                                 spawnedState.env[EXIT_CODE_ID] = EXIT_FAILURE;
                             } else {
                                 throw error;
                             }
                         }
                     }
+
+                    // successfully execution
                     resolve();
                 } catch (error) {
+                    // handle error
                     reject(error);
                 }
             },
