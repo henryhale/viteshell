@@ -96,6 +96,14 @@ export default class ViteShell implements Shell {
         }
     }
 
+    public set onexit(handler: () => void) {
+        if (isFunction(handler)) {
+            this.#abortSignal.onAbort = handler;
+        } else {
+            throw new TypeError("onexit handler must be a function.");
+        }
+    }
+
     public addCommand(name: ICommandName, config: ICommandConfig): void {
         if (this.#bin.has(name)) {
             throw new Error(

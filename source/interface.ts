@@ -192,21 +192,26 @@ declare class ViteShell {
     public readonly history: string[];
 
     /**
-     * Sets the function that will be invoked on every output request
+     * Registers the function that invoked on every output request
      * throught the shell output stream
      */
     public onoutput: OutputHandler;
 
     /**
-     * Sets a function invoked on every error write operation via the
+     * Registers a function invoked on every error write operation via the
      * output stream
      */
     public onerror: OutputHandler;
 
     /**
-     * Sets a function invoked when the output stream is cleared
+     * Registers a function invoked when the output stream is cleared
      */
     public onclear: () => void;
+
+    /**
+     * Registers a function invoked when an abort signal
+     */
+    public onexit: () => void;
 
     /**
      * Adds a new command to the shell's bin box
