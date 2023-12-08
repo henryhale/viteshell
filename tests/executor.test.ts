@@ -1,9 +1,8 @@
+import { findNextCommand, matchVariable } from "../source/executor/index";
 import {
     createAbortablePromise,
-    createAbortSignal,
-    findNextCommand,
-    matchVariable
-} from "../source/executor/index";
+    createAbortSignal
+} from "../source/util/index";
 import { parseInputIntoCommands } from "../source/parser/index";
 
 jest.useFakeTimers();
