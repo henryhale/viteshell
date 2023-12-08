@@ -1,5 +1,21 @@
 # Changelog
 
+# [0.6.0](https://github.com/henryhale/viteshell/compare/v0.5.0...v0.6.0) (2023-12-08)
+
+
+### Bug Fixes
+
+* flush output stream before activation ([eb3d165](https://github.com/henryhale/viteshell/commit/eb3d165821dafc82497b82210e80f1e09aead7f2))
+* update state and remove conflicting operations ([a6e3ef8](https://github.com/henryhale/viteshell/commit/a6e3ef805c3e2e7fc0ad2da43c863607acabe919))
+
+
+### Features
+
+* add grep command and command examples in docs ([913b742](https://github.com/henryhale/viteshell/commit/913b7422906d28a9f05ef7baf4d026690691122a))
+* add writeln() method to output streams ([f17bf77](https://github.com/henryhale/viteshell/commit/f17bf770f330cf20f6db0f82af107f8e6c21f562))
+* added default aliases and new builtins ([ef79db3](https://github.com/henryhale/viteshell/commit/ef79db3603de45ff103f87c1469a71942e74f05d))
+* set execution timeout for all commands ([c838dc7](https://github.com/henryhale/viteshell/commit/c838dc7caac6e75a929936d89763664e5e666fb9))
+
 # [0.5.0](https://github.com/henryhale/viteshell/compare/v0.4.1...v0.5.0) (2023-10-03)
 
 
