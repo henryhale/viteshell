@@ -32,11 +32,8 @@ import type { ParsedCommand } from "./parser/parse";
 import {
     type IAbortSignal,
     createAbortSignal,
-    createAbortablePromise,
-    findNextCommand,
-    createProcessContext
-} from "./executor";
-import { defineState, spawnState, type IState, patchState } from "./state";
+    createAbortablePromise
+} from "./util";
 
 /**
  * ViteShell

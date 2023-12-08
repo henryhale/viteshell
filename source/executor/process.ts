@@ -5,7 +5,7 @@ import { spawnState, type IState } from "../state";
 import { replaceEnvVariables } from "../state/env";
 import InputStream from "../streams/input";
 import OutputStream from "../streams/output";
-import type { IAbortSignal } from "./signal";
+import type { IAbortSignal } from "../util";
 
 export function createProcessContext(
     state: IState,
