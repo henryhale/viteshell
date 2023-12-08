@@ -1,4 +1,4 @@
-import InputStream from "../source/input/index";
+import InputStream from "../source/streams/input";
 
 describe("Input stream interface", () => {
     let stdin: InputStream;

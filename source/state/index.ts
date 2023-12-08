@@ -1,38 +1,39 @@
 import { defineEnv } from "./env";
-import type { IAlias, IEnv, IShellState, IState } from "../interface";
+import type { IAlias, IEnv } from "../interface";
 
-export default class State implements IShellState {
-    public readonly env: IEnv;
-    public readonly alias: IAlias;
-    public readonly history: string[];
+/**
+ * Storable Shell State
+ */
+export interface IState {
+    readonly env: IEnv;
+    readonly alias: IAlias;
+    readonly history: string[];
+}
 
-    constructor() {
-        this.env = defineEnv();
-        this.alias = {};
-        this.history = [];
-    }
+/**
+ * Create shell's state
+ */
+export function defineState(): IState {
+    return {
+        env: defineEnv(),
+        alias: {},
+        history: []
+    };
+}
 
-    public import(savedState: string): void {
-        const parsed = this.spawn(savedState);
-        this.patch(parsed);
-    }
+/**
+ * Create a copy of the shell's state
+ */
+export function spawnState(s: IState | string): IState {
+    return JSON.parse(typeof s === "string" ? s : JSON.stringify(s));
+}
 
-    public toJSON(): string {
-        return JSON.stringify({
-            history: this.history,
-            alias: this.alias,
-            env: this.env
-        });
-    }
-
-    public spawn(str?: string): IState {
-        return JSON.parse(str || this.toJSON());
-    }
-
-    public patch(mutatedState: IState): void {
-        Object.assign(this.alias, mutatedState.alias);
-        Object.assign(this.env, mutatedState.env);
-        this.history.splice(0);
-        this.history.push(...mutatedState.history);
-    }
+/**
+ * Patch changes into original state
+ */
+export function patchState(original: IState, mutated: IState): void {
+    Object.assign(original.alias, mutated.alias);
+    Object.assign(original.env, mutated.env);
+    original.history.splice(0);
+    original.history.push(...mutated.history);
 }

@@ -1,5 +1,5 @@
 import ViteShell from "../source/index";
-import { IProcess } from "../source/interface";
+import type { IProcess } from "../source/interface";
 
 describe("ViteShell", () => {
     test("shell version is defined", () => {
@@ -25,13 +25,13 @@ describe("ViteShell", () => {
     });
 
     test("shell state properties", () => {
-        shell.alias["print"] = "echo";
-        expect(Object.keys(shell.alias)).toHaveLength(1);
+        shell.alias["println"] = "echo";
+        expect(Object.keys(shell.alias)).toHaveLength(5);
 
-        delete shell.alias["print"];
-        expect(Object.keys(shell.alias)).toHaveLength(0);
+        delete shell.alias["println"];
+        expect(Object.keys(shell.alias)).toHaveLength(4);
 
-        shell.env["USER_ID"] = 123456;
+        shell.env["USER_ID"] = "123456";
         expect(shell.env["USER_ID"]).toBeDefined();
 
         expect(shell.history).toHaveLength(0);
@@ -54,9 +54,7 @@ describe("ViteShell", () => {
             shell.addCommand("hello", {
                 synopsis: "hello [user]",
                 description: "Displays a greeting message for the user",
-                action: function (
-                    process: IProcess
-                ): number | void | Promise<number | void> {
+                action: (process: IProcess): void | Promise<void> => {
                     process.stdout.write("\nHello " + process.argv[0]);
                 }
             });
@@ -126,7 +124,14 @@ describe("ViteShell", () => {
 
         // first initialise
         shell.init();
-        expect(shell.env["?"]).toEqual(0);
+        expect(shell.env["?"]).toEqual("0");
+
+        // builtin command
+        await shell.execute("clear").finally(() => {
+            expect(box).toHaveLength(1);
+        });
+        // exit status
+        expect(shell.env["?"]).toEqual("0");
 
         // unknown command
         await shell.execute("blahblah").finally(() => {
@@ -134,14 +139,7 @@ describe("ViteShell", () => {
             expect(box.at(-2)).toMatch(/command not found/g);
         });
         // exit status
-        expect(shell.env["?"]).toEqual(1);
-
-        // builtin command
-        await shell.execute("clear").finally(() => {
-            expect(box).toHaveLength(1);
-        });
-        // exit status
-        expect(shell.env["?"]).toEqual(0);
+        expect(shell.env["?"]).toEqual("1");
     });
 
     // test("timing commands");
@@ -152,13 +150,13 @@ describe("ViteShell", () => {
 
         // test `help` command
         await shell.execute("help");
-        expect(shell.env["?"]).toEqual(0);
+        expect(shell.env["?"]).toEqual("0");
 
         // remove `help` command
         expect(() => shell.removeCommand("help")).not.toThrowError();
 
         // retry `help` command
         await shell.execute("help");
-        expect(shell.env["?"]).toEqual(1);
+        expect(shell.env["?"]).toEqual("1");
     });
 });

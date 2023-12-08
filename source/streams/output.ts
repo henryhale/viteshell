@@ -1,10 +1,9 @@
-import type {
-    OutputData,
-    OutputStreamInterface,
-    OutputType
-} from "../interface";
+import type { OutputData, OutputType } from "../interface";
 
-export default class OutputStream implements OutputStreamInterface {
+/**
+ * Output stream
+ */
+export default class OutputStream {
     private isActive: boolean;
     public bufferOutput: boolean;
     private readonly buffer: { type: OutputType; data: OutputData }[];
@@ -13,13 +12,10 @@ export default class OutputStream implements OutputStreamInterface {
     public onerror?: (msg: OutputData) => void;
     public onclear?: () => void;
 
-    public beforeOutput?: (data: string) => string;
-
     constructor() {
         this.isActive = true;
         this.bufferOutput = false;
         this.buffer = [];
-        this.beforeOutput = undefined;
     }
 
     public disable(): void {
@@ -34,18 +30,11 @@ export default class OutputStream implements OutputStreamInterface {
         this.onclear?.call(undefined);
     }
 
-    public write(
-        data: OutputData,
-        type: OutputType = "data",
-        replace = true
-    ): void {
+    public write(data: OutputData, type: OutputType = "data"): void {
         if (!this.isActive) {
             return;
         }
         data = data?.toString();
-        if (replace && this.beforeOutput) {
-            data = this.beforeOutput(data);
-        }
         if (this.bufferOutput) {
             this.buffer.push({ type, data });
         } else {
@@ -78,7 +67,7 @@ export default class OutputStream implements OutputStreamInterface {
     }
 
     public reset() {
-        this.enable();
         this.flush();
+        this.enable();
     }
 }
