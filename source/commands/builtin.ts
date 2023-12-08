@@ -17,6 +17,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
         description: "Clear the entire standard output stream.",
         action: ({ stdout }) => stdout.clear()
     });
+    state.alias["cls"] = "clear";
 
     // pwd
     bin.set("pwd", {
@@ -32,6 +33,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
             "Write arguments to the standard output followed by a new line character.",
         action: ({ argv, stdout }) => stdout.writeln(argv.join(" "))
     });
+    state.alias["print"] = "echo";
 
     // alias
     bin.set("alias", {
@@ -43,6 +45,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
                 Object.entries(state.alias).forEach(([k, v]) => {
                     stdout.write("\n\talias " + k + "='" + v + "'");
                 });
+                stdout.write("\n");
             } else {
                 argv.forEach((v) => {
                     const match = matchVariable(v);
@@ -52,7 +55,6 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
                     }
                 });
             }
-            stdout.write("\n");
         }
     });
 
@@ -70,7 +72,7 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
 
     // export
     bin.set("export", {
-        synopsis: "export [name=[value] ... ]",
+        synopsis: "export [-p] [name=[value] ... ]",
         description: "Set shell variables by name and value",
         action: ({ argv, env, stdout }) => {
             if (!argv.length || argv.includes("-p")) {
@@ -116,16 +118,17 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
 
     // help
     bin.set("help", {
-        synopsis: "help",
+        synopsis: "help [command]",
         description: "Displays information on available commands.",
         action: ({ argv, stdout }) => {
             if (argv[0]) {
-                const cmd = bin.get(argv[0]);
+                const cmdName = argv[0];
+                const cmd = bin.get(cmdName);
                 if (!cmd) {
-                    throw "help: no information matching '" + cmd + "'";
+                    throw "help: no information matching '" + cmdName + "'";
                 }
                 const { synopsis, description } = cmd;
-                stdout.write(cmd + ": " + synopsis + "\n\t" + description);
+                stdout.write(cmdName + ": " + synopsis + "\n\t" + description);
             } else {
                 stdout.write(
                     `ViteShell, ${VERSION} Help\n\nA list of all available commands\n\n`
@@ -142,8 +145,35 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
             stdout.write("\n");
         }
     });
+    state.alias["info"] = "help";
+    state.alias["man"] = "help";
 
     // read
-    // wait
+    bin.set("read", {
+        synopsis: "read [prompt] [variable]",
+        description: "Capture input and save it in the env object.",
+        action: async ({ argv, env, stdin, stdout }) => {
+            if (argv[0] && argv[1]) {
+                stdout.write(argv[0]);
+                env[argv[1]] = await stdin.readline();
+            } else {
+                throw "invalid arguments: specify the prompt and variable name";
+            }
+        }
+    });
+
     // sleep
+    bin.set("sleep", {
+        synopsis: "sleep [seconds]",
+        description: "Delay for a specified amount of time (in seconds).",
+        action: async ({ argv }) => {
+            const t = parseInt(argv[0], 10);
+            if (isNaN(t) || t <= 0) {
+                throw "invalid time specified (minimum is 1)";
+            }
+            await new Promise<void>((resolve) =>
+                setTimeout(() => resolve(), t * 1000)
+            );
+        }
+    });
 }

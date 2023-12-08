@@ -25,11 +25,11 @@ describe("ViteShell", () => {
     });
 
     test("shell state properties", () => {
-        shell.alias["print"] = "echo";
-        expect(Object.keys(shell.alias)).toHaveLength(1);
+        shell.alias["println"] = "echo";
+        expect(Object.keys(shell.alias)).toHaveLength(5);
 
-        delete shell.alias["print"];
-        expect(Object.keys(shell.alias)).toHaveLength(0);
+        delete shell.alias["println"];
+        expect(Object.keys(shell.alias)).toHaveLength(4);
 
         shell.env["USER_ID"] = "123456";
         expect(shell.env["USER_ID"]).toBeDefined();
