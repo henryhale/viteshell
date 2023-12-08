@@ -51,6 +51,7 @@ export interface StandardError {
      * @param data The text to output
      */
     write(data: OutputData): void;
+    writeln(data: OutputData): void;
 }
 
 /**

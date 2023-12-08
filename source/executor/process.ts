@@ -25,13 +25,15 @@ export function createProcessContext(
         clear: () => !done && output.clear(),
         write: (data: string) => {
             if (!done) output.write(replaceEnvVariables(state.env, data));
-        }
+        },
+        writeln: (data: string) => stdout.write(data + "\n")
     };
 
     const stderr = {
         write: (msg: string) => {
             if (!done) output.error(replaceEnvVariables(state.env, msg));
-        }
+        },
+        writeln: (data: string) => stderr.write(data + "\n")
     };
 
     return {
