@@ -1,4 +1,4 @@
-import OutputStream from "../source/output/index";
+import OutputStream from "../source/streams/output";
 
 describe("Output stream", () => {
     let stdout: OutputStream;

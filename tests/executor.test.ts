@@ -1,9 +1,8 @@
+import { findNextCommand, matchVariable } from "../source/executor/index";
 import {
-    AbortSignalToken,
     createAbortablePromise,
-    findNextCommand,
-    matchVariable
-} from "../source/executor/index";
+    createAbortSignal
+} from "../source/util/index";
 import { parseInputIntoCommands } from "../source/parser/index";
 
 jest.useFakeTimers();
@@ -44,15 +43,18 @@ describe("Next command lookup", () => {
 
         expect(c).toEqual({
             cmd: "npm",
+            args: "npm i",
             argv: ["i"],
             PIPE: undefined,
             AND: {
                 cmd: "npm",
+                args: "npm run dev",
                 argv: ["run", "dev"],
                 PIPE: undefined,
                 AND: undefined,
                 OR: {
                     cmd: "echo",
+                    args: "echo setup failed!",
                     argv: ["setup failed!"],
                     PIPE: undefined,
                     AND: undefined,
@@ -69,11 +71,13 @@ describe("Next command lookup", () => {
         status = true;
         expect(findNextCommand(c, status)).toEqual({
             cmd: "npm",
+            args: "npm run dev",
             argv: ["run", "dev"],
             PIPE: undefined,
             AND: undefined,
             OR: {
                 cmd: "echo",
+                args: "echo setup failed!",
                 argv: ["setup failed!"],
                 PIPE: undefined,
                 AND: undefined,
@@ -85,6 +89,7 @@ describe("Next command lookup", () => {
         status = false;
         expect(findNextCommand(c, status)).toEqual({
             cmd: "echo",
+            args: "echo setup failed!",
             argv: ["setup failed!"],
             PIPE: undefined,
             AND: undefined,
@@ -95,33 +100,33 @@ describe("Next command lookup", () => {
 
 describe("Abort signal token", () => {
     test("usage", () => {
-        const signal = new AbortSignalToken();
+        const signal = createAbortSignal();
 
         expect(signal).toHaveProperty("abort");
         expect(signal).toHaveProperty("onAbort");
+        expect(signal).toHaveProperty("reset");
+        expect(signal).toHaveProperty("isAborted");
 
         let reason!: string;
 
         signal.onAbort((r) => (reason = r as string));
 
-        expect(signal["isCancelled"]).toBeFalsy();
-        expect(signal["handlers"]).toHaveProperty("size", 1);
+        expect(signal["isAborted"]).toBeFalsy();
 
         signal.abort("error: aborted");
 
         expect(reason).toEqual("error: aborted");
 
-        expect(signal["handlers"]).toHaveProperty("size", 0);
-        expect(signal["isCancelled"]).toBeTruthy();
+        expect(signal["isAborted"]).toBeTruthy();
 
         signal.reset();
 
-        expect(signal["isCancelled"]).toBeFalsy();
+        expect(signal["isAborted"]).toBeFalsy();
     });
 });
 
 describe("Abortable promise", () => {
-    const signal = new AbortSignalToken();
+    const signal = createAbortSignal();
 
     beforeEach(() => signal.reset());
 

@@ -1,7 +1,7 @@
-import { parseArgs } from "./input";
-import { parseCommand } from "./commands";
-import type { ParsedCommand } from "../interface";
+import { tokenize } from "./lexer";
+import { parseTokens } from "./parse";
+import type { ParsedCommand } from "./parse";
 
 export function parseInputIntoCommands(str: string): ParsedCommand[] {
-    return parseArgs(str).map((args) => parseCommand(args));
+    return tokenize(str).map((args) => parseTokens(args));
 }

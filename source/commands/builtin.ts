@@ -1,12 +1,13 @@
-import { version } from "../constants";
+import { VERSION } from "../constants";
 import { matchVariable } from "../executor/command";
-import type { ICommandConfig, ICommandLibrary, IState } from "../interface";
+import type { ICommandLibrary } from "../interface";
+import type { IState } from "../state";
 
 export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
     // exit
     bin.set("exit", {
         synopsis: "exit",
-        description: "Terminate current process",
+        description: "Terminate the current process",
         action: ({ exit }) => exit()
     });
 
@@ -16,12 +17,13 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
         description: "Clear the entire standard output stream.",
         action: ({ stdout }) => stdout.clear()
     });
+    state.alias["cls"] = "clear";
 
     // pwd
     bin.set("pwd", {
         synopsis: "pwd",
         description: "Print current working directory.",
-        action: ({ stdout }) => stdout.write("$CWD\n")
+        action: ({ stdout }) => stdout.writeln("$CWD")
     });
 
     // echo
@@ -29,22 +31,21 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
         synopsis: "echo [...args]",
         description:
             "Write arguments to the standard output followed by a new line character.",
-        action({ argv, stdout }) {
-            argv.forEach((v) => stdout.write(v));
-            stdout.write("\n");
-        }
+        action: ({ argv, stdout }) => stdout.writeln(argv.join(" "))
     });
+    state.alias["print"] = "echo";
 
     // alias
     bin.set("alias", {
         synopsis: "alias [-p] [name=[value] ... ]",
         description: "Defines aliases for commands",
-        action({ argv, stdout }) {
+        action: ({ argv, stdout }) => {
             if (!argv.length || argv.includes("-p")) {
                 stdout.write("Aliases:");
                 Object.entries(state.alias).forEach(([k, v]) => {
                     stdout.write("\n\talias " + k + "='" + v + "'");
                 });
+                stdout.write("\n");
             } else {
                 argv.forEach((v) => {
                     const match = matchVariable(v);
@@ -54,15 +55,14 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
                     }
                 });
             }
-            stdout.write("\n");
         }
     });
 
     // unalias
     bin.set("unalias", {
-        synopsis: "unalias [name=[value] ... ]",
+        synopsis: "unalias [name ... ]",
         description: "Removes aliases for commands",
-        action({ argv }) {
+        action: ({ argv }) => {
             if (!argv.length) return;
             argv.forEach((v) => {
                 delete state.alias[v];
@@ -72,9 +72,9 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
 
     // export
     bin.set("export", {
-        synopsis: "export [name=[value] ... ]",
+        synopsis: "export [-p] [name=[value] ... ]",
         description: "Set shell variables by name and value",
-        action({ argv, env, stdout }) {
+        action: ({ argv, env, stdout }) => {
             if (!argv.length || argv.includes("-p")) {
                 Object.entries(env).forEach(([k, v]) => {
                     stdout.write(
@@ -107,10 +107,10 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
             if (argv.includes("-c")) {
                 history.splice(0);
             } else if (argv.includes("-n")) {
-                stdout.write(`History: ${history.length}\n`);
+                stdout.writeln(`History: ${history.length}`);
             } else {
                 history.forEach((v, i) => {
-                    stdout.write("  " + i + "\t" + v + "\n");
+                    stdout.writeln("  " + i + "\t" + v);
                 });
             }
         }
@@ -118,36 +118,78 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
 
     // help
     bin.set("help", {
-        synopsis: "help",
+        synopsis: "help [command]",
         description: "Displays information on available commands.",
-        action({ argv, stdout }) {
+        action: ({ argv, stdout }) => {
             if (argv[0]) {
-                const cmd = argv[0];
-                if (!bin.has(cmd)) {
-                    throw "help: no information matching '" + cmd + "'";
+                const cmdName = argv[0];
+                const cmd = bin.get(cmdName);
+                if (!cmd) {
+                    throw "help: no information matching '" + cmdName + "'";
                 }
-                const { synopsis, description } = bin.get(
-                    cmd
-                ) as ICommandConfig;
-                stdout.write(cmd + ": " + synopsis + "\n\t" + description);
+                const { synopsis, description } = cmd;
+                stdout.writeln(
+                    cmdName + ": " + synopsis + "\n\t" + description
+                );
             } else {
                 stdout.write(
-                    `ViteShell, ${version} Help\n\nA list of all available commands\n\n`
+                    `ViteShell, ${VERSION} Help\n\nA list of all available commands\n\n`
                 );
-                const all = Array.from(bin.values()).map((v) => v.synopsis);
-                const longest = all.reduce((v, c) => {
-                    return v > c.length ? v : c.length;
-                }, 0);
-                all.sort((a, b) => (a > b ? 1 : -1)).forEach((v, i) => {
-                    stdout.write(v.padEnd(longest, " "));
-                    stdout.write(i % 2 ? "\n" : "\t");
-                });
+                Array.from(bin.values())
+                    .map((v) => v.synopsis)
+                    .sort()
+                    .forEach((v) => stdout.writeln(v));
             }
-            stdout.write("\n");
+        }
+    });
+    state.alias["info"] = "help";
+    state.alias["man"] = "help";
+
+    // read
+    bin.set("read", {
+        synopsis: "read [prompt] [variable]",
+        description: "Capture input and save it in the env object.",
+        action: async ({ argv, env, stdin, stdout }) => {
+            if (argv[0] && argv[1]) {
+                stdout.write(argv[0]);
+                env[argv[1]] = await stdin.readline();
+            } else {
+                throw "invalid arguments: specify the prompt and variable name";
+            }
         }
     });
 
-    // read
-    // wait
     // sleep
+    bin.set("sleep", {
+        synopsis: "sleep [seconds]",
+        description: "Delay for a specified amount of time (in seconds).",
+        action: async ({ argv }) => {
+            const t = parseInt(argv[0], 10);
+            if (isNaN(t) || t <= 0) {
+                throw "invalid time specified (minimum is 1)";
+            }
+            await new Promise<void>((resolve) =>
+                setTimeout(() => resolve(), t * 1000)
+            );
+        }
+    });
+
+    // grep
+    bin.set("grep", {
+        synopsis: "grep [keyword] [context ...]",
+        description: "Searches for matching phrases in the text",
+        action: async ({ argv, stdout }) => {
+            if (argv.length < 2) {
+                throw "invalid arguments";
+            }
+            const reg = new RegExp(argv[0], "g");
+            argv.slice(1).forEach((x) => {
+                if (reg.test(x)) {
+                    stdout.writeln(
+                        x.replaceAll(argv[0], (m) => "**" + m + "**")
+                    );
+                }
+            });
+        }
+    });
 }

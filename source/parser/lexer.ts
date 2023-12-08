@@ -4,16 +4,16 @@
 export const delimiters = [";", "|", "&&", "||"];
 
 /**
- * Parse raw input into commands
+ * Parse raw input into tokens
  *
  * NB:
  * This is a customized version of the npm package:
  * [arrgv](https://github.com/astur/arrgv)
  *
  * @param str The raw input from the command line or script
- * @returns An array of commands and their arguments
+ * @returns An array of tokens and their arguments
  */
-export function parseArgs(str: string): string[][] {
+export function tokenize(str: string): string[][] {
     const res: string[][] = [];
 
     if (!str || typeof str !== "string") return res;
