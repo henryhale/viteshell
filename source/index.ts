@@ -193,13 +193,14 @@ export default class ViteShell implements Shell {
         try {
             // execute command handler
             await command.action.call(undefined, p);
-            // extract previous output for piped command
-            if (c.PIPE) {
-                c.PIPE.argv.push(...this.#output.extract);
-                await this.#execvp(c.PIPE, p);
-            }
         } catch (error) {
             errorMsg = c.cmd + ": " + error;
+        }
+
+        // extract previous output for piped command
+        if (c.PIPE) {
+            c.PIPE.argv.push(...this.#output.extract);
+            await this.#execvp(c.PIPE, p);
         }
 
         // look for next executable command in the chain basing on exit status
