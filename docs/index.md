@@ -2,36 +2,47 @@
 
 Table of Contents
 
--   Overview
--   Getting Started
--   Installation
--   Initialization
--   State Management
--   Commands
--   Callback
--   Activation
--   Command Execution
--   Chaining and Pipes
--   Abort Signal
--   API Reference
+- [viteshell | docs](#viteshell--docs)
+  - [Overview](#overview)
+  - [Getting Started](#getting-started)
+  - [Installation](#installation)
+  - [Initialization](#initialization)
+  - [State Management](#state-management)
+    - [Aliases](#aliases)
+    - [Environment Variables](#environment-variables)
+    - [History](#history)
+    - [Backup and Restore](#backup-and-restore)
+  - [Commands](#commands)
+    - [Builtin Commands](#builtin-commands)
+    - [Custom Commands](#custom-commands)
+  - [Callbacks](#callbacks)
+  - [Activation](#activation)
+  - [Command Execution](#command-execution)
+    - [Executing commands](#executing-commands)
+    - [Timeout](#timeout)
+  - [Chaining and Pipes](#chaining-and-pipes)
+    - [Chaining](#chaining)
+    - [Pipes](#pipes)
+  - [Abort Signal](#abort-signal)
+  - [API Reference](#api-reference)
 
 ## Overview
 
 According to the GNU Bash Reference Manual, _a shell is simply a macro processor that executes commands._
 
-`viteshell` is made to be used in interactive mode only, that is, accept input typed from keyboard.
+_viteshell_ is made to be used in interactive mode only, that is, accept input typed from keyboard.
 It is intended to work synchronously; waiting for command execution to complete before accepting more input.
-Just like real shell programs like dash, bash, fish or zsh, `viteshell` provides a set of built-in commands as well as environment variables. However, it does not contain or implement it's own file system.
+Just like real shell programs like dash, bash, fish or zsh, _viteshell_ provides a set of built-in commands as well as environment variables. However, it does not contain or implement it's own file system.
 
-Everything you need to know about how `viteshell` works is discussed in the subsquent sections.
+Everything you need to know about how _viteshell_ works is discussed in the subsquent sections.
 
 ## Getting Started
 
-To get started with `viteshell`, you will need an interface through which you can enter commands and also view output of the executed commands. The interface can be the browser console or a remote server or an in-browser terminal emulator(like xterminal or jquery.terminal or xterm.js).
+To get started with _viteshell_, you will need an interface through which you can enter commands and also view output of the executed commands. The interface can be the browser console or a remote server or an in-browser terminal emulator(like xterminal or jquery.terminal or xterm.js).
 
 ## Installation
 
-The latest version of `viteshell`, packaged and published on npm, can be installed into a new or existing project in a number of ways:
+The latest version of _viteshell_, packaged and published on npm, can be installed into a new or existing project in a number of ways:
 
 -   NPM : Install the module via [npm](https://npmjs.org/package/viteshell). Run the following command to add as a dependency.
 
@@ -67,7 +78,7 @@ The latest version of `viteshell`, packaged and published on npm, can be install
 
 ## Initialization
 
-To use `viteshell`, first create a new instance of it
+To use _viteshell_, first create a new instance of it
 
 ```html
 <script>
@@ -75,9 +86,9 @@ To use `viteshell`, first create a new instance of it
 </script>
 ```
 
-## Shell Management
+## State Management
 
-`viteshell` maintains it's own state used during command execution. It contains a list of aliases, environment variables and command history.
+_viteshell_ maintains it's own state used during command execution. It contains a list of aliases, environment variables and command history.
 
 ### Aliases
 
@@ -99,7 +110,7 @@ delete vsh.alias["print"];
 
 Using viteshell's `alias` and `unalias` [built-in commands](#builtin-commands), aliases can be set and unset.
 
-By default, `viteshell` provides a number of aliases that may be commonly known for example: `cls` for `clear`, `print` for `echo` and so on. View all of them in your console using: `console.log(vsh.alias)`;
+By default, _viteshell_ provides a number of aliases that may be commonly known for example: `cls` for `clear`, `print` for `echo` and so on. View all of them in your console using: `console.log(vsh.alias)`;
 
 ### Environment Variables
 
@@ -122,7 +133,7 @@ There exists `export` [built-in command](#builtin-commands) for setting and disp
 
 ### History
 
-Whenever the shell recieves input, it is stored in the history object. `viteshell` does not store similar and consecutive inputs.
+Whenever the shell recieves input, it is stored in the history object. _viteshell_ does not store similar and consecutive inputs.
 
 To access the entries in the history: `vsh.history`
 
@@ -155,11 +166,11 @@ window.onload = () => {
 
 A sequence of words provided as input to the shell denotes a command. For example: `echo 1 2 3 4` denotes a simple command `echo` followed by space separated arguments `1`, `2`, `3` and `4`. When executed, the shell captures it's exit status and saves it in the environment variable: `?`
 
-A combination of several simple commands separated by the shell's special character (delimiters) results into a compound command. In `viteshell`, delimiters include [chaining](#chaining) characters and [pipes](#pipes).
+A combination of several simple commands separated by the shell's special character (delimiters) results into a compound command. In _viteshell_, delimiters include [chaining](#chaining) characters and [pipes](#pipes).
 
 ### Builtin Commands
 
-`viteshell` comes with buitlin commands most of which can be re-implemented by you.
+_viteshell_ comes with buitlin commands most of which can be re-implemented by you.
 
 <dialog>
 <summary>View Builtin Commands</summary>
@@ -282,7 +293,7 @@ vsh.onexit = () => {
 
 Output and input streams can be implemented to make use of the in-browser console or a remote server or web-based terminal emulator(like [xterminal](https://github.com/henryhale/xterminal), [xterm.js](https://github.com/xtermjs/xterm.js), jquery.terminal).
 
-In case you want to use a terminal emulator, [XTerminal](https://github.com/henryhale/xterminal) provides a simple interface (recommended). Checkout [vix](https://github.com/henryhale/vix), a starter template for `viteshell` and XTerminal. Learn how to use `xterminal` [here](https://github.com/henryhale/xterminal#readme).
+In case you want to use a terminal emulator, [XTerminal](https://github.com/henryhale/xterminal) provides a simple interface (recommended). Checkout [vix](https://github.com/henryhale/vix), a starter template for _viteshell_ and XTerminal. Learn how to use xterminal [here](https://github.com/henryhale/xterminal#readme).
 
 Otherwise, for simplicity, add two elements in your markup: `#input` for capturing input and `#output` for displaying output.
 
@@ -391,4 +402,4 @@ document.addEventListener("keydown", (ev) => {
 
 ## API Reference
 
-The full public API for `viteshell` is contained within the TypeScript [declaration file](https://github.com/henryhale/viteshell/blob/master/source/interface.ts). It helps you understand the different interfaces required to setup your shell.
+The full public API for _viteshell_ is contained within the TypeScript [declaration file](https://github.com/henryhale/viteshell/blob/master/source/interface.ts). It helps you understand the different interfaces required to setup your shell.
