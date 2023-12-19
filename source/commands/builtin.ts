@@ -133,7 +133,9 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
                 );
             } else {
                 stdout.write(
-                    `ViteShell, ${VERSION} Help\n\nA list of all available commands\n\n`
+                    "ViteShell, " +
+                        VERSION +
+                        " Help\n\nA list of all available commands\n\n"
                 );
                 Array.from(bin.values())
                     .map((v) => v.synopsis)
