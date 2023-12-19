@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.5](https://github.com/henryhale/viteshell/compare/v0.6.4...v0.6.5) (2023-12-19)
+
+
+### Bug Fixes
+
+* onexit callbacks not being invoked on exit ([0053e29](https://github.com/henryhale/viteshell/commit/0053e2966cca07f2bc261fb2987956fb724a0438))
+
 ## [0.6.4](https://github.com/henryhale/viteshell/compare/v0.6.3...v0.6.4) (2023-12-18)
 
 ## [0.6.3](https://github.com/henryhale/viteshell/compare/v0.6.2...v0.6.3) (2023-12-08)
