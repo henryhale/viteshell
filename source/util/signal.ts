@@ -33,7 +33,6 @@ export function createAbortSignal(): IAbortSignal {
 
     function reset(): void {
         aborted = false;
-        if (handlers.size) handlers.clear();
     }
 
     return {
