@@ -1,3 +1,0 @@
-fix: bug
-    - abort signal handlers are cleared before command execution
-    - running exit command does not execute the abort signal handlers
