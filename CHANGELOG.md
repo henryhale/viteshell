@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.6.7](https://github.com/henryhale/viteshell/compare/v0.6.6...v0.6.7) (2023-12-21)
+
 ## [0.6.6](https://github.com/henryhale/viteshell/compare/v0.6.5...v0.6.6) (2023-12-19)
 
 ## [0.6.5](https://github.com/henryhale/viteshell/compare/v0.6.4...v0.6.5) (2023-12-19)
