@@ -1,5 +1,5 @@
 <div align="center">
-<img width="45" src="../media/logo.jpg"/>
+<img width="45" src="https://github.com/henryhale/viteshell/raw/master/media/logo.jpg"/>
 <h1>viteshell</h1>
 <p>A minimalistic shell implementation written in TypeScript.</p>
 <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/henryhale/viteshell/release.yml">
@@ -34,6 +34,7 @@ Table of Contents
   - [Pipes](#pipes)
 - [Abort Signal](#abort-signal)
 - [API Reference](#api-reference)
+- [License](#license)
 
 ## Overview
 
@@ -419,3 +420,9 @@ document.addEventListener("keydown", (ev) => {
 ## API Reference
 
 The full public API for _viteshell_ is contained within the TypeScript [declaration file](https://github.com/henryhale/viteshell/blob/master/source/interface.ts). It helps you understand the different interfaces required to setup your shell.
+
+## License
+
+Copyright (c) 2023 [Henry Hale](https://github.com/henryhale).
+
+Released under the [MIT License](https://github.com/henryhale/viteshell/blob/master/LICENSE.txt).
