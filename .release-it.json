@@ -8,6 +8,7 @@
     "github": {
         "release": true,
         "releaseName": "ViteShell v${version}",
+        "autoGenerate": true,
         "assets": ["dist/"],
         "comments": true
     },
@@ -20,9 +21,14 @@
     },
     "plugins": {
         "@release-it/conventional-changelog": {
-            "preset": "angular",
             "infile": "CHANGELOG.md",
-            "header": "# Changelog"
+            "header": "# Changelog",
+            "preset": {
+                "name": "conventionalcommits"
+            },
+            "gitRawCommitsOpts": {
+                "merges": null
+            }
         }
     }
 }
