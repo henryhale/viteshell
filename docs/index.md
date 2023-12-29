@@ -1,30 +1,39 @@
-# viteshell | docs
+<div align="center">
+<img width="45" src="../media/logo.jpg"/>
+<h1>viteshell</h1>
+<p>A minimalistic shell implementation written in TypeScript.</p>
+<img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/henryhale/viteshell/release.yml">
+<img alt="npm" src="https://img.shields.io/npm/v/viteshell">
+<img alt="GitHub release (latest SemVer)" src="https://img.shields.io/github/v/release/henryhale/viteshell">
+<img alt="npm bundle size" src="https://img.shields.io/bundlephobia/minzip/viteshell">
+<img alt="GitHub" src="https://img.shields.io/github/license/henryhale/viteshell">
+</div>
 
 Table of Contents
 
-- [viteshell | docs](#viteshell--docs)
-  - [Overview](#overview)
-  - [Getting Started](#getting-started)
-  - [Installation](#installation)
-  - [Initialization](#initialization)
-  - [State Management](#state-management)
-    - [Aliases](#aliases)
-    - [Environment Variables](#environment-variables)
-    - [History](#history)
-    - [Backup and Restore](#backup-and-restore)
-  - [Commands](#commands)
-    - [Builtin Commands](#builtin-commands)
-    - [Custom Commands](#custom-commands)
-  - [Callbacks](#callbacks)
-  - [Activation](#activation)
-  - [Command Execution](#command-execution)
-    - [Executing commands](#executing-commands)
-    - [Timeout](#timeout)
-  - [Chaining and Pipes](#chaining-and-pipes)
-    - [Chaining](#chaining)
-    - [Pipes](#pipes)
-  - [Abort Signal](#abort-signal)
-  - [API Reference](#api-reference)
+- [Overview](#overview)
+- [Live Demo](#live-demo)
+- [Getting Started](#getting-started)
+- [Installation](#installation)
+- [Initialization](#initialization)
+- [State Management](#state-management)
+  - [Aliases](#aliases)
+  - [Environment Variables](#environment-variables)
+  - [History](#history)
+  - [Backup and Restore](#backup-and-restore)
+- [Commands](#commands)
+  - [Builtin Commands](#builtin-commands)
+  - [Custom Commands](#custom-commands)
+- [Callbacks](#callbacks)
+- [Activation](#activation)
+- [Command Execution](#command-execution)
+  - [Executing commands](#executing-commands)
+  - [Timeout](#timeout)
+- [Chaining and Pipes](#chaining-and-pipes)
+  - [Chaining](#chaining)
+  - [Pipes](#pipes)
+- [Abort Signal](#abort-signal)
+- [API Reference](#api-reference)
 
 ## Overview
 
@@ -35,6 +44,13 @@ It is intended to work synchronously; waiting for command execution to complete 
 Just like real shell programs like dash, bash, fish or zsh, _viteshell_ provides a set of built-in commands as well as environment variables. However, it does not contain or implement it's own file system.
 
 Everything you need to know about how _viteshell_ works is discussed in the subsquent sections.
+
+## Live Demo
+
+The demo allows you to explore the features of `viteshell` and interact with the key functionalities.
+Click the link below to access the live demo:
+
+[🚀 Live Demo](https://henryhale.github.io/vix)
 
 ## Getting Started
 

@@ -1,4 +1,5 @@
 <div align="center">
+<img width="45" src="./media/logo.jpg"/>
 <h1>viteshell</h1>
 <p>A minimalistic shell implementation written in TypeScript.</p>
 <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/henryhale/viteshell/release.yml">
