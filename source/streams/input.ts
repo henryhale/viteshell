@@ -41,7 +41,8 @@ export default class InputStream implements StandardInput {
         });
     }
 
-    public clear(): void {
+    public reset(): void {
         this.buffer.splice(0);
+        this.extractor = undefined;
     }
 }
