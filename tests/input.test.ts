@@ -13,7 +13,7 @@ describe("Input stream interface", () => {
         expect(stdin).toHaveProperty("isBusy");
         expect(stdin).toHaveProperty("insert");
         expect(stdin).toHaveProperty("readline");
-        expect(stdin).toHaveProperty("clear");
+        expect(stdin).toHaveProperty("reset");
     });
 
     test("usage", () => {
