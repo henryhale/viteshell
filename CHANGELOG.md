@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.11](https://github.com/henryhale/viteshell/compare/v0.6.10...v0.6.11) (2024-01-05)
+
+
+### Bug Fixes
+
+* issue [#2](https://github.com/henryhale/viteshell/issues/2) ([e1f72db](https://github.com/henryhale/viteshell/commit/e1f72dbff86f20b4d56863297d6571a96c4ee412))
+
 ## [0.6.10](https://github.com/henryhale/viteshell/compare/v0.6.9...v0.6.10) (2023-12-29)
 
 ## [0.6.9](https://github.com/henryhale/viteshell/compare/v0.6.8...v0.6.9) (2023-12-29)
