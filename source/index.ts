@@ -226,14 +226,17 @@ export default class ViteShell implements Shell {
             return Promise.reject(SHELL_INACTIVE);
         }
 
-        // flush the output stream and then activate it
-        this.#output.reset();
-
         // incase there's a currently executing command requiring user input
         if (this.#input.isBusy) {
             this.#input.insert(line);
             return Promise.resolve();
+        } else {
+            // otherwise clear the input buffer and any input callback
+            this.#input.reset();
         }
+
+        // flush the output stream and then activate it
+        this.#output.reset();
 
         // check if the line contains characters
         if (typeof line !== "string" || !line.trim()) {
@@ -253,6 +256,7 @@ export default class ViteShell implements Shell {
 
         // reset abort token for reuse
         this.#abortSignal.reset();
+        this.#abortSignal.onAbort(() => this.#input.reset());
 
         // setup a nodejs-like process object
         const process = createProcessContext(
