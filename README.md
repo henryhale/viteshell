@@ -33,7 +33,7 @@
 > **Note**: Currently, `viteshell` only provides a platform for handling some basic shell operations. Support for other functionalities like input/output redirection, shell scripts, complex shell expansion and job control is not provided.  
 
 ## Documentation
-To get started with `viteshell`, read the [documentation here](https://github.com/henryhale/viteshell/blob/master/docs/index.md).
+To get started with `viteshell`, read the [documentation here](https://viteshell.js.org).
 
 ## Live Demo
 The demo allows you to explore the features of `viteshell` and interact with the key functionalities.
