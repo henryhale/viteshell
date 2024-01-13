@@ -227,6 +227,11 @@ declare class ViteShell {
     public removeCommand(name: ICommandName): void;
 
     /**
+     * Get a list of all registered commands
+     */
+    public listCommands(): string[];
+
+    /**
      * Backups the shell state returning a JSON string
      */
     public exportState(): string;

@@ -189,7 +189,14 @@ A combination of several simple commands separated by the shell's special charac
 
 _viteshell_ comes with buitlin commands most of which can be re-implemented by you.
 
-<dialog>
+To programmatically view all registered commands, use
+
+```js
+const list = vsh.listCommands();
+// ['alias', 'date', ...]
+```
+
+<details>
 <summary>View Builtin Commands</summary>
 
 -   exit
@@ -258,7 +265,11 @@ _viteshell_ comes with buitlin commands most of which can be re-implemented by y
 
     Example: `help | grep clear` to capture all occurences of `clear` in the output of the `help` command 
 
-</dialog>
+-   date
+    
+    _date_ - Displays the current time and date
+
+</details>
 
 ### Custom Commands
 

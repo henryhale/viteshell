@@ -194,4 +194,11 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
             });
         }
     });
+
+    // date
+    bin.set("date", {
+        synopsis: "date",
+        description: "Displays the current time and date",
+        action: ({ stdout }) => stdout.writeln(new Date().toString())
+    });
 }

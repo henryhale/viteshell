@@ -122,6 +122,10 @@ export default class ViteShell implements Shell {
         this.#bin.delete(name);
     }
 
+    public listCommands(): string[] {
+        return Array.from(this.#bin.keys());
+    }
+
     public exportState(): string {
         return JSON.stringify(this.#state);
     }
