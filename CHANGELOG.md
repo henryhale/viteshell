@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/henryhale/viteshell/compare/v0.6.11...v0.7.0) (2024-01-14)
+
+
+### Features
+
+* add date command and listCommands method ([82fa4ee](https://github.com/henryhale/viteshell/commit/82fa4ee1144e276aab3a88d6ff7854364ba889c6))
+
 ## [0.6.11](https://github.com/henryhale/viteshell/compare/v0.6.10...v0.6.11) (2024-01-05)
 
 
