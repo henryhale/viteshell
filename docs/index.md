@@ -196,8 +196,7 @@ const list = vsh.listCommands();
 // ['alias', 'date', ...]
 ```
 
-<details>
-<summary>View Builtin Commands</summary>
+**List of  Builtin Commands**
 
 -   exit
 
@@ -268,8 +267,6 @@ const list = vsh.listCommands();
 -   date
     
     _date_ - Displays the current time and date
-
-</details>
 
 ### Custom Commands
 
