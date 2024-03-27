@@ -299,7 +299,7 @@ export default class ViteShell implements Shell {
                         }
                     }
 
-                    // successfully execution
+                    // successfully executed
                     resolve();
                 } catch (error) {
                     // handle error
