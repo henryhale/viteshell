@@ -80,11 +80,7 @@ export default class OutputStream {
         this.bufferOutput = false;
         if (this.buffer.length) {
             this.buffer.splice(0).forEach((d) => {
-                if (d.type === "error") {
-                    this.error(d.data);
-                } else {
-                    this.write(d.data);
-                }
+                this.write(d.data, d.type);
             });
         }
     }
