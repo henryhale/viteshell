@@ -7,6 +7,13 @@ import InputStream from "../streams/input";
 import OutputStream from "../streams/output";
 import type { IAbortSignal } from "../util";
 
+/**
+ * Every child process has its own execution context that
+ * expires when it is terminated or aborted.
+ *
+ * It exposes all neccessary features accessible to the
+ * executed command
+ */
 export function createProcessContext(
     state: IState,
     input: InputStream,

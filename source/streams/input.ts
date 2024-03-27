@@ -13,10 +13,17 @@ export default class InputStream implements StandardInput {
         this.extractor = undefined;
     }
 
+    /**
+     * Checks whether there is an executing command waiting for
+     * user input
+     */
     public get isBusy(): boolean {
         return this.extractor !== undefined;
     }
 
+    /**
+     * Saves input data into a queue (buffer)
+     */
     public insert(data = ""): void {
         this.buffer.push(data);
         if (isFunction(this.extractor)) {
@@ -24,10 +31,18 @@ export default class InputStream implements StandardInput {
         }
     }
 
+    /**
+     * Retrieves the data at the front of the queue (buffer)
+     */
     private get extract(): string {
         return this.buffer.shift()?.trim() || "";
     }
 
+    /**
+     * Extracts an input string from the input buffer
+     *
+     * It uses a callback function if the buffer is empty.
+     */
     public readline(): Promise<string> {
         return new Promise<string>((resolve) => {
             if (this.buffer.length) {
@@ -41,6 +56,9 @@ export default class InputStream implements StandardInput {
         });
     }
 
+    /**
+     * Reset the stream's state
+     */
     public reset(): void {
         this.buffer.splice(0);
         this.extractor = undefined;
