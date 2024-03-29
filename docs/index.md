@@ -311,9 +311,6 @@ vsh.onerror = (error) => {
 vsh.onclear = () => {
     /* clear output display */
 };
-vsh.onexit = () => {
-    /* cleanup */
-};
 ```
 
 Output and input streams can be implemented to make use of the in-browser console or a remote server or web-based terminal emulator(like [xterminal](https://github.com/henryhale/xterminal), [xterm.js](https://github.com/xtermjs/xterm.js), jquery.terminal).
@@ -335,9 +332,9 @@ const vsh = new ViteShell();
 const output = document.querySelector("#output");
 const input = document.querySelector("#input");
 
-vsh.onoutput = (data) => (output.innerHTML += data);
-vsh.onerror = (error) => (output.innerHTML += error);
-vsh.onclear = () => (output.innerHTML = "");
+vsh.onoutput = (data) => { output.innerHTML += data };
+vsh.onerror = (error) => { output.innerHTML += error };
+vsh.onclear = () => { output.innerHTML = "" };
 
 input.onkeydown = (ev) => {
     if (ev.key == "Enter") {
@@ -374,7 +371,9 @@ Since you have connected your shell to an input/output stream using [callbacks](
 
 ```js
 const exec = async (input) => {
-    return await vsh.execute(input);
+    // ...
+    await vsh.execute(input);
+    // ...
 };
 
 exec('echo "Hello World!"');
@@ -384,7 +383,7 @@ exec('echo "Hello World!"');
 
 Set an execution time limit beyond which the execution of a command is aborted.
 
-**Example:** All commands must execute to completion in less than `5` seconds otherwise aborted.
+**Example:** All commands must execute to completion in `5` seconds otherwise timed out(aborted).
 
 ```js
 vsh.setExecutionTimeout(5);
@@ -431,6 +430,6 @@ The full public API for _viteshell_ is contained within the TypeScript [declarat
 
 ## License
 
-Copyright (c) 2023 [Henry Hale](https://github.com/henryhale).
+Copyright (c) 2023-Present [Henry Hale](https://github.com/henryhale).
 
 Released under the [MIT License](https://github.com/henryhale/viteshell/blob/master/LICENSE.txt).
