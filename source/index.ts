@@ -29,13 +29,10 @@ import { isCommandValid } from "./commands";
 import { addBuiltinCommands } from "./commands/builtin";
 import { parseInputIntoCommands } from "./parser";
 import type { ParsedCommand } from "./parser/parse";
-import { findNextCommand, createProcessContext } from "./executor";
+import { findNextCommand } from "./executor";
+import { createProcessContext } from "./executor/process";
 import { defineState, spawnState, type IState, patchState } from "./state";
-import {
-    type IAbortSignal,
-    createAbortSignal,
-    createAbortablePromise
-} from "./util";
+import { createAbortablePromise } from "./util/promise";
 
 /**
  * ViteShell
@@ -46,7 +43,7 @@ export default class ViteShell implements Shell {
     #state: IState;
     #bin: ICommandLibrary;
     #active: boolean;
-    #abortSignal: IAbortSignal;
+    #abortController?: AbortController;
     #timeout?: number;
 
     constructor() {
@@ -55,7 +52,7 @@ export default class ViteShell implements Shell {
         this.#state = defineState();
         this.#bin = new Map();
         this.#active = false;
-        this.#abortSignal = createAbortSignal();
+        this.#abortController = undefined;
 
         addBuiltinCommands(this.#bin, this.#state);
     }
@@ -92,15 +89,9 @@ export default class ViteShell implements Shell {
         if (isFunction(handler)) {
             this.#output.onclear = handler;
         } else {
-            throw new TypeError("onclear handler must be a function.");
-        }
-    }
-
-    public set onexit(handler: (reason?: unknown) => void) {
-        if (isFunction(handler)) {
-            this.#abortSignal.onAbort(handler);
-        } else {
-            throw new TypeError("onexit handler must be a function.");
+            throw new TypeError(
+                `${SHELL_NAME}: onclear handler must be a function.`
+            );
         }
     }
 
@@ -136,7 +127,6 @@ export default class ViteShell implements Shell {
 
     #prompt() {
         this.env[RANDOM_ID] = "" + randomInt();
-        this.#abortSignal.reset();
         this.#output.reset();
         this.#output.write(
             replaceEnvVariables(this.env, this.env[PROMPT_STYLE_ID])
@@ -259,20 +249,23 @@ export default class ViteShell implements Shell {
         const spawnedState = spawnState(this.#state);
 
         // reset abort token for reuse
-        this.#abortSignal.reset();
-        this.#abortSignal.onAbort(() => this.#input.reset());
+        const controller = new AbortController();
+        const signal = controller.signal;
+        this.#abortController = controller;
+        signal.addEventListener("abort", () => {
+            this.#input.reset();
+        });
 
         // setup a nodejs-like process object
         const process = createProcessContext(
             spawnedState,
             this.#input,
             this.#output,
-            this.#abortSignal
+            controller
         );
 
         // run child process in parallel with abort signal listener and timeout handler
         return await createAbortablePromise<void>(
-            this.#abortSignal,
             async (resolve, reject) => {
                 try {
                     // parse input
@@ -280,7 +273,10 @@ export default class ViteShell implements Shell {
 
                     for (const command of commands) {
                         // prevent unnecessary runs
-                        if (this.#abortSignal.isAborted) throw PROCESS_ABORTED;
+                        if (signal.aborted) {
+                            throw PROCESS_ABORTED;
+                        }
+
                         try {
                             // execute command
                             await this.#execvp(command, process);
@@ -306,6 +302,7 @@ export default class ViteShell implements Shell {
                     reject(error);
                 }
             },
+            controller,
             this.#timeout
         )
             .catch((error) => {
@@ -319,8 +316,8 @@ export default class ViteShell implements Shell {
             });
     }
 
-    public abort(reason?: unknown): void {
-        this.#abortSignal.abort(reason);
+    public abort(reason?: string): void {
+        this.#abortController?.abort(reason || PROCESS_ABORTED);
     }
 
     static get version(): string {
