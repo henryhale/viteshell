@@ -154,8 +154,10 @@ export default class ViteShell implements Shell {
     }
 
     public setExecutionTimeout(value: number): void {
-        if (typeof value === "number" && value >= MIN_TIMEOUT) {
-            this.#timeout = value;
+        if (typeof value === "number" && value > MIN_TIMEOUT) {
+            this.#timeout = value * 1000;
+        } else {
+            throw new TypeError(`${SHELL_NAME}: invalid value for timeout.`);
         }
     }
 
