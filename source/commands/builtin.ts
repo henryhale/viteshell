@@ -165,14 +165,20 @@ export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
     bin.set("sleep", {
         synopsis: "sleep [seconds]",
         description: "Delay for a specified amount of time (in seconds).",
-        action: async ({ argv }) => {
+        action: async ({ argv, onExit }) => {
             const t = parseInt(argv[0], 10);
             if (isNaN(t) || t <= 0) {
                 throw "invalid time specified (minimum is 1)";
             }
-            await new Promise<void>((resolve) =>
-                setTimeout(() => resolve(), t * 1000)
-            );
+            await new Promise<void>((resolve) => {
+                // eslint-disable-next-line prefer-const
+                let id: unknown;
+                onExit(() => {
+                    clearTimeout(id as number);
+                    resolve();
+                });
+                id = setTimeout(() => resolve(), t * 1000);
+            });
         }
     });
 
