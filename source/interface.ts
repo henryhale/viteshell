@@ -209,9 +209,10 @@ declare class ViteShell {
     public onclear: () => void;
 
     /**
-     * Registers a function invoked when an abort signal
+     * Registers a function invoked when an abort signal is triggered
+     * @deprecated
      */
-    public onexit: () => void;
+    // public onexit: (reason?: string) => void;
 
     /**
      * Adds a new command to the shell's bin box
@@ -266,7 +267,7 @@ declare class ViteShell {
     /**
      * Aborts the current process or executing command
      */
-    public abort(reason?: unknown): void;
+    public abort(reason?: string): void;
 
     // public executeScript(script: string): Promise<void>;
 

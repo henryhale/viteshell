@@ -1,9 +1,9 @@
 import { PROCESS_ABORTED, PROCESS_TIMED_OUT } from "../constants";
-import type { IAbortSignal } from "./signal";
 
-type ExecutableAction<T> = (
+type ExecutableAction<T = unknown> = (
     resolve: (value: T) => void,
-    reject: (reason?: unknown) => void
+    reject: (reason?: unknown) => void,
+    signal: AbortSignal
 ) => unknown;
 
 /**
@@ -12,35 +12,41 @@ type ExecutableAction<T> = (
  * - If the `timeout` argument is provided, the promise is cancelled
  * if the execution exceeds that time
  */
-export function createAbortablePromise<T = unknown>(
-    signal: IAbortSignal,
-    fn: ExecutableAction<T>,
+export function createAbortablePromise<T>(
+    executor: ExecutableAction<T>,
+    controller: AbortController,
     timeout?: number
 ) {
-    function createTask() {
-        return new Promise<T>((resolve, reject) => {
-            signal.onAbort((reason) => reject(reason || PROCESS_ABORTED));
-            try {
-                fn?.call(undefined, resolve, reject);
-            } catch (error) {
-                reject(error?.toString());
-            }
+    const signal = controller.signal;
+
+    const task = new Promise<T>((resolve, reject) => {
+        signal.addEventListener("abort", () => {
+            reject(signal.reason || PROCESS_ABORTED);
         });
+        executor.call(undefined, resolve, reject, signal);
+    });
+
+    if (!(timeout && timeout > 0)) {
+        return task;
     }
-    if (!timeout) return createTask();
-    let task!: Promise<T>;
-    return Promise.race([
-        (task = createTask()),
-        new Promise<void>((_, reject) => {
-            const id = setTimeout(() => {
-                signal.abort(PROCESS_TIMED_OUT);
-            }, timeout);
-            function endProcess(reason: unknown) {
-                if (id) clearTimeout(id);
-                reject(reason);
-            }
-            task?.catch(endProcess);
-            signal.onAbort(endProcess);
-        })
-    ]);
+
+    const timer = new Promise<void>((resolve, reject) => {
+        // eslint-disable-next-line prefer-const
+        let id: unknown;
+        signal.addEventListener("abort", () => {
+            clearTimeout(id as number);
+            reject(signal.reason || PROCESS_ABORTED);
+        });
+        signal.addEventListener("success", () => {
+            clearTimeout(id as number);
+            resolve();
+        });
+        id = setTimeout(() => {
+            controller.abort(PROCESS_TIMED_OUT);
+        }, timeout);
+    });
+
+    return Promise.race([timer, task]).finally(() => {
+        controller.signal.dispatchEvent(new CustomEvent("success"));
+    });
 }
