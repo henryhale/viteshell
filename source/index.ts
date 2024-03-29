@@ -160,6 +160,27 @@ export default class ViteShell implements Shell {
     }
 
     async #execvp(c: ParsedCommand, p: IProcess): Promise<void> {
+        // error message;
+        let errorMsg = "";
+
+        const next = async () => {
+            // look for next executable command in the chain basing on exit status
+            if (c.OR || c.AND) {
+                const nxt = findNextCommand(c, !errorMsg.length);
+                if (nxt) {
+                    if (errorMsg.length) {
+                        p.stderr.writeln(errorMsg);
+                        errorMsg = "";
+                    }
+                    await this.#execvp(nxt, p);
+                }
+            }
+
+            if (errorMsg.length) {
+                throw errorMsg;
+            }
+        };
+
         // first check for alias - less parsing priority
         const alias = this.alias[c.cmd];
         if (alias) {
@@ -174,7 +195,8 @@ export default class ViteShell implements Shell {
 
         // check if command is defined
         if (!command) {
-            throw c.cmd + ": " + COMMAND_NOT_FOUND;
+            errorMsg = c.cmd + ": " + COMMAND_NOT_FOUND;
+            return await next();
         }
 
         // update the process object
@@ -184,9 +206,6 @@ export default class ViteShell implements Shell {
 
         // whether to buffer the output or not
         this.#output.bufferOutput = c.PIPE !== undefined;
-
-        // error message;
-        let errorMsg = "";
 
         try {
             // execute command handler
@@ -201,21 +220,8 @@ export default class ViteShell implements Shell {
             await this.#execvp(c.PIPE, p);
         }
 
-        // look for next executable command in the chain basing on exit status
-        if (c.OR || c.AND) {
-            const nxt = findNextCommand(c, !errorMsg.length);
-            if (nxt) {
-                if (errorMsg.length) {
-                    p.stderr.writeln(errorMsg);
-                    errorMsg = "";
-                }
-                await this.#execvp(nxt, p);
-            }
-        }
-
-        if (errorMsg.length) {
-            throw errorMsg;
-        }
+        // next
+        await next();
     }
 
     public async execute(line: string = ""): Promise<void> {
