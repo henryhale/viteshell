@@ -73,7 +73,9 @@ export default class ViteShell implements Shell {
         if (isFunction(handler)) {
             this.#output.onoutput = handler;
         } else {
-            throw new TypeError("onoutput handler must be a function.");
+            throw new TypeError(
+                `${SHELL_NAME}: onoutput handler must be a function.`
+            );
         }
     }
 
@@ -81,7 +83,9 @@ export default class ViteShell implements Shell {
         if (isFunction(handler)) {
             this.#output.onerror = handler;
         } else {
-            throw new TypeError("onerror handler must be a function.");
+            throw new TypeError(
+                `${SHELL_NAME}: onerror handler must be a function.`
+            );
         }
     }
 
@@ -103,7 +107,7 @@ export default class ViteShell implements Shell {
         }
 
         if (!isCommandValid(config)) {
-            throw new Error(`${SHELL_NAME}: invalid command configuration`);
+            throw new Error(`${SHELL_NAME}: invalid command configuration.`);
         }
 
         this.#bin.set(name, config);
