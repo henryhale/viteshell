@@ -302,15 +302,22 @@ You need a terminal interface for inputting textual commands and outputting data
 Below is a generic setup to register callback functions for output handling and shell termination.
 
 ```js
+// triggered when outputting data 
 vsh.onoutput = (data) => {
     /* print data */
 };
+
+// triggered when writing errors
 vsh.onerror = (error) => {
     /* print error */
 };
+
+// triggered when the `clear` command is issued
 vsh.onclear = () => {
     /* clear output display */
 };
+
+// triggered when the `exit` command is issued
 vsh.onexit = () => {
     /* cleanup */
 };
@@ -335,9 +342,9 @@ const vsh = new ViteShell();
 const output = document.querySelector("#output");
 const input = document.querySelector("#input");
 
-vsh.onoutput = (data) => (output.innerHTML += data);
-vsh.onerror = (error) => (output.innerHTML += error);
-vsh.onclear = () => (output.innerHTML = "");
+vsh.onoutput = (data) => { output.innerHTML += data };
+vsh.onerror = (error) => { output.innerHTML += error };
+vsh.onclear = () => { output.innerHTML = "" };
 
 input.onkeydown = (ev) => {
     if (ev.key == "Enter") {
@@ -355,10 +362,10 @@ input.onkeydown = (ev) => {
 Now activate the shell to prepare it for command execution with an optional _greeting or intro_ message.
 
 ```js
-vsh.init("\nHello World!\n");
+vsh.reset("\nHello World!\n");
 ```
 
-The above line not only activates the shell but also prints the greeting message followed by the default prompt.
+The above line not only resets or activates the shell but also prints the greeting message followed by the default prompt.
 
 At this point, it should be working just well.
 
@@ -374,7 +381,9 @@ Since you have connected your shell to an input/output stream using [callbacks](
 
 ```js
 const exec = async (input) => {
-    return await vsh.execute(input);
+    // ...
+    await vsh.execute(input);
+    // ...
 };
 
 exec('echo "Hello World!"');
@@ -384,7 +393,7 @@ exec('echo "Hello World!"');
 
 Set an execution time limit beyond which the execution of a command is aborted.
 
-**Example:** All commands must execute to completion in less than `5` seconds otherwise aborted.
+**Example:** All commands must execute to completion in `5` seconds otherwise timed out(aborted).
 
 ```js
 vsh.setExecutionTimeout(5);
@@ -431,6 +440,6 @@ The full public API for _viteshell_ is contained within the TypeScript [declarat
 
 ## License
 
-Copyright (c) 2023 [Henry Hale](https://github.com/henryhale).
+Copyright (c) 2023-Present [Henry Hale](https://github.com/henryhale).
 
 Released under the [MIT License](https://github.com/henryhale/viteshell/blob/master/LICENSE.txt).

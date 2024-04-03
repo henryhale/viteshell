@@ -72,7 +72,7 @@ export const RANDOM_ID = "RANDOM";
  * Error message if the shell is inactive
  */
 export const SHELL_INACTIVE =
-    SHELL_NAME + ": inactive, use shell.init() to activate";
+    SHELL_NAME + ": inactive, use shell.reset() to activate";
 
 /**
  * Minimum execution timeout

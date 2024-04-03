@@ -18,18 +18,32 @@ export default class OutputStream {
         this.buffer = [];
     }
 
+    /**
+     * Deactivates the stream, no writes allowed
+     */
     public disable(): void {
         this.isActive = false;
     }
 
+    /**
+     * Activates the stream, writing data is allowed
+     */
     public enable(): void {
         this.isActive = true;
     }
 
+    /**
+     * Clears the entire output stream
+     */
     public clear(): void {
         this.onclear?.call(undefined);
     }
 
+    /**
+     * Output data to the stream
+     *
+     * The data is buffered incase of piping.
+     */
     public write(data: OutputData, type: OutputType = "data"): void {
         if (!this.isActive) {
             return;
@@ -45,27 +59,35 @@ export default class OutputStream {
         }
     }
 
+    /**
+     * Output error messages
+     */
     public error(msg: OutputData): void {
         this.write(msg, "error");
     }
 
+    /**
+     * Retrieves the data from the buffer leaving it empty
+     */
     public get extract(): string[] {
         return this.buffer.splice(0).map((v) => v.data + "");
     }
 
+    /**
+     * Empties the stream's buffer by outputting data
+     */
     public flush(): void {
         this.bufferOutput = false;
         if (this.buffer.length) {
             this.buffer.splice(0).forEach((d) => {
-                if (d.type === "error") {
-                    this.error(d.data);
-                } else {
-                    this.write(d.data);
-                }
+                this.write(d.data, d.type);
             });
         }
     }
 
+    /**
+     * Reset the stream's state
+     */
     public reset() {
         this.flush();
         this.enable();
