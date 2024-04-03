@@ -26,7 +26,7 @@ import {
     VERSION
 } from "./constants";
 import { isCommandValid } from "./commands";
-import { addBuiltinCommands } from "./commands/builtin";
+import { addBuiltinCommands, setExitHandler } from "./commands/builtin";
 import { parseInputIntoCommands } from "./parser";
 import type { ParsedCommand } from "./parser/parse";
 import { findNextCommand } from "./executor";
@@ -95,6 +95,16 @@ export default class ViteShell implements Shell {
         } else {
             throw new TypeError(
                 `${SHELL_NAME}: onclear handler must be a function.`
+            );
+        }
+    }
+
+    public set onexit(handler: () => void) {
+        if (isFunction(handler)) {
+            setExitHandler(handler);
+        } else {
+            throw new TypeError(
+                `${SHELL_NAME}: onexit handler must be a function.`
             );
         }
     }
@@ -210,6 +220,10 @@ export default class ViteShell implements Shell {
         this.#output.bufferOutput = c.PIPE !== undefined;
 
         try {
+            // deactivate shell on `exit` command
+            if (c.cmd === "exit") {
+                this.#active = false;
+            }
             // execute command handler
             await command.action.call(undefined, p);
         } catch (error) {

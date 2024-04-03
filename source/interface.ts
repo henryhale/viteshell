@@ -210,9 +210,8 @@ declare class ViteShell {
 
     /**
      * Registers a function invoked when an abort signal is triggered
-     * @deprecated
      */
-    // public onexit: (reason?: string) => void;
+    public onexit: () => void;
 
     /**
      * Adds a new command to the shell's bin box
