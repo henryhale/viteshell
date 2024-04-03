@@ -3,12 +3,21 @@ import { matchVariable } from "../executor/command";
 import type { ICommandLibrary } from "../interface";
 import type { IState } from "../state";
 
+let onExitCallback: undefined | (() => void);
+
+export function setExitHandler(fn: () => void) {
+    onExitCallback = fn;
+}
+
 export function addBuiltinCommands(bin: ICommandLibrary, state: IState) {
     // exit
     bin.set("exit", {
         synopsis: "exit",
         description: "Terminate the current process",
-        action: ({ exit }) => exit()
+        action: ({ exit }) => {
+            onExitCallback?.call(undefined);
+            exit();
+        }
     });
 
     // clear

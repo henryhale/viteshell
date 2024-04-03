@@ -302,14 +302,24 @@ You need a terminal interface for inputting textual commands and outputting data
 Below is a generic setup to register callback functions for output handling and shell termination.
 
 ```js
+// triggered when outputting data 
 vsh.onoutput = (data) => {
     /* print data */
 };
+
+// triggered when writing errors
 vsh.onerror = (error) => {
     /* print error */
 };
+
+// triggered when the `clear` command is issued
 vsh.onclear = () => {
     /* clear output display */
+};
+
+// triggered when the `exit` command is issued
+vsh.onexit = () => {
+    /* cleanup */
 };
 ```
 
