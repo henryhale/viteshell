@@ -244,10 +244,10 @@ declare class ViteShell {
     public loadState(json: string): void;
 
     /**
-     * Initializes the shell with a greeting and display the prompt
+     * Resets the shell with a greeting and displays the prompt
      * @param greeting The text to greet the user
      */
-    public init(greeting?: string): void;
+    public reset(greeting?: string): void;
 
     /**
      * Set command execution timeout beyond which the process is terminated

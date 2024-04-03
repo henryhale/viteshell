@@ -147,11 +147,10 @@ export default class ViteShell implements Shell {
         );
     }
 
-    public init(greeting = ""): void {
-        if (this.#active) {
-            return;
-        }
+    public reset(greeting = ""): void {
         this.#active = true;
+
+        this.#input.reset();
 
         this.#output.clear();
 

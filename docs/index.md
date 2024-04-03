@@ -362,10 +362,10 @@ input.onkeydown = (ev) => {
 Now activate the shell to prepare it for command execution with an optional _greeting or intro_ message.
 
 ```js
-vsh.init("\nHello World!\n");
+vsh.reset("\nHello World!\n");
 ```
 
-The above line not only activates the shell but also prints the greeting message followed by the default prompt.
+The above line not only resets or activates the shell but also prints the greeting message followed by the default prompt.
 
 At this point, it should be working just well.
 
