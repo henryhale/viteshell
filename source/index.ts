@@ -26,16 +26,13 @@ import {
     VERSION
 } from "./constants";
 import { isCommandValid } from "./commands";
-import { addBuiltinCommands } from "./commands/builtin";
+import { addBuiltinCommands, setExitHandler } from "./commands/builtin";
 import { parseInputIntoCommands } from "./parser";
 import type { ParsedCommand } from "./parser/parse";
-import { findNextCommand, createProcessContext } from "./executor";
+import { findNextCommand } from "./executor";
+import { createProcessContext } from "./executor/process";
 import { defineState, spawnState, type IState, patchState } from "./state";
-import {
-    type IAbortSignal,
-    createAbortSignal,
-    createAbortablePromise
-} from "./util";
+import { createAbortablePromise } from "./util/promise";
 
 /**
  * ViteShell
@@ -46,7 +43,7 @@ export default class ViteShell implements Shell {
     #state: IState;
     #bin: ICommandLibrary;
     #active: boolean;
-    #abortSignal: IAbortSignal;
+    #abortController?: AbortController;
     #timeout?: number;
 
     constructor() {
@@ -55,7 +52,7 @@ export default class ViteShell implements Shell {
         this.#state = defineState();
         this.#bin = new Map();
         this.#active = false;
-        this.#abortSignal = createAbortSignal();
+        this.#abortController = undefined;
 
         addBuiltinCommands(this.#bin, this.#state);
     }
@@ -76,7 +73,9 @@ export default class ViteShell implements Shell {
         if (isFunction(handler)) {
             this.#output.onoutput = handler;
         } else {
-            throw new TypeError("onoutput handler must be a function.");
+            throw new TypeError(
+                `${SHELL_NAME}: onoutput handler must be a function.`
+            );
         }
     }
 
@@ -84,7 +83,9 @@ export default class ViteShell implements Shell {
         if (isFunction(handler)) {
             this.#output.onerror = handler;
         } else {
-            throw new TypeError("onerror handler must be a function.");
+            throw new TypeError(
+                `${SHELL_NAME}: onerror handler must be a function.`
+            );
         }
     }
 
@@ -92,15 +93,19 @@ export default class ViteShell implements Shell {
         if (isFunction(handler)) {
             this.#output.onclear = handler;
         } else {
-            throw new TypeError("onclear handler must be a function.");
+            throw new TypeError(
+                `${SHELL_NAME}: onclear handler must be a function.`
+            );
         }
     }
 
-    public set onexit(handler: (reason?: unknown) => void) {
+    public set onexit(handler: () => void) {
         if (isFunction(handler)) {
-            this.#abortSignal.onAbort(handler);
+            setExitHandler(handler);
         } else {
-            throw new TypeError("onexit handler must be a function.");
+            throw new TypeError(
+                `${SHELL_NAME}: onexit handler must be a function.`
+            );
         }
     }
 
@@ -112,7 +117,7 @@ export default class ViteShell implements Shell {
         }
 
         if (!isCommandValid(config)) {
-            throw new Error(`${SHELL_NAME}: invalid command configuration`);
+            throw new Error(`${SHELL_NAME}: invalid command configuration.`);
         }
 
         this.#bin.set(name, config);
@@ -136,18 +141,16 @@ export default class ViteShell implements Shell {
 
     #prompt() {
         this.env[RANDOM_ID] = "" + randomInt();
-        this.#abortSignal.reset();
         this.#output.reset();
         this.#output.write(
             replaceEnvVariables(this.env, this.env[PROMPT_STYLE_ID])
         );
     }
 
-    public init(greeting = ""): void {
-        if (this.#active) {
-            return;
-        }
+    public reset(greeting = ""): void {
         this.#active = true;
+
+        this.#input.reset();
 
         this.#output.clear();
 
@@ -160,12 +163,35 @@ export default class ViteShell implements Shell {
     }
 
     public setExecutionTimeout(value: number): void {
-        if (typeof value === "number" && value >= MIN_TIMEOUT) {
-            this.#timeout = value;
+        if (typeof value === "number" && value > MIN_TIMEOUT) {
+            this.#timeout = value * 1000;
+        } else {
+            throw new TypeError(`${SHELL_NAME}: invalid value for timeout.`);
         }
     }
 
     async #execvp(c: ParsedCommand, p: IProcess): Promise<void> {
+        // error message;
+        let errorMsg = "";
+
+        const next = async () => {
+            // look for next executable command in the chain basing on exit status
+            if (c.OR || c.AND) {
+                const nxt = findNextCommand(c, !errorMsg.length);
+                if (nxt) {
+                    if (errorMsg.length) {
+                        p.stderr.writeln(errorMsg);
+                        errorMsg = "";
+                    }
+                    await this.#execvp(nxt, p);
+                }
+            }
+
+            if (errorMsg.length) {
+                throw errorMsg;
+            }
+        };
+
         // first check for alias - less parsing priority
         const alias = this.alias[c.cmd];
         if (alias) {
@@ -180,7 +206,8 @@ export default class ViteShell implements Shell {
 
         // check if command is defined
         if (!command) {
-            throw c.cmd + ": " + COMMAND_NOT_FOUND;
+            errorMsg = c.cmd + ": " + COMMAND_NOT_FOUND;
+            return await next();
         }
 
         // update the process object
@@ -191,10 +218,11 @@ export default class ViteShell implements Shell {
         // whether to buffer the output or not
         this.#output.bufferOutput = c.PIPE !== undefined;
 
-        // error message;
-        let errorMsg = "";
-
         try {
+            // deactivate shell on `exit` command
+            if (c.cmd === "exit") {
+                this.#active = false;
+            }
             // execute command handler
             await command.action.call(undefined, p);
         } catch (error) {
@@ -207,21 +235,8 @@ export default class ViteShell implements Shell {
             await this.#execvp(c.PIPE, p);
         }
 
-        // look for next executable command in the chain basing on exit status
-        if (c.OR || c.AND) {
-            const nxt = findNextCommand(c, !errorMsg.length);
-            if (nxt) {
-                if (errorMsg.length) {
-                    p.stderr.writeln(errorMsg);
-                    errorMsg = "";
-                }
-                await this.#execvp(nxt, p);
-            }
-        }
-
-        if (errorMsg.length) {
-            throw errorMsg;
-        }
+        // next
+        await next();
     }
 
     public async execute(line: string = ""): Promise<void> {
@@ -259,20 +274,23 @@ export default class ViteShell implements Shell {
         const spawnedState = spawnState(this.#state);
 
         // reset abort token for reuse
-        this.#abortSignal.reset();
-        this.#abortSignal.onAbort(() => this.#input.reset());
+        const controller = new AbortController();
+        const signal = controller.signal;
+        this.#abortController = controller;
+        signal.addEventListener("abort", () => {
+            this.#input.reset();
+        });
 
         // setup a nodejs-like process object
         const process = createProcessContext(
             spawnedState,
             this.#input,
             this.#output,
-            this.#abortSignal
+            controller
         );
 
         // run child process in parallel with abort signal listener and timeout handler
         return await createAbortablePromise<void>(
-            this.#abortSignal,
             async (resolve, reject) => {
                 try {
                     // parse input
@@ -280,7 +298,10 @@ export default class ViteShell implements Shell {
 
                     for (const command of commands) {
                         // prevent unnecessary runs
-                        if (this.#abortSignal.isAborted) throw PROCESS_ABORTED;
+                        if (signal.aborted) {
+                            throw PROCESS_ABORTED;
+                        }
+
                         try {
                             // execute command
                             await this.#execvp(command, process);
@@ -299,13 +320,14 @@ export default class ViteShell implements Shell {
                         }
                     }
 
-                    // successfully execution
+                    // successfully executed
                     resolve();
                 } catch (error) {
                     // handle error
                     reject(error);
                 }
             },
+            controller,
             this.#timeout
         )
             .catch((error) => {
@@ -319,8 +341,8 @@ export default class ViteShell implements Shell {
             });
     }
 
-    public abort(reason?: unknown): void {
-        this.#abortSignal.abort(reason);
+    public abort(reason?: string): void {
+        this.#abortController?.abort(reason || PROCESS_ABORTED);
     }
 
     static get version(): string {

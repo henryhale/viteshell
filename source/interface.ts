@@ -209,7 +209,7 @@ declare class ViteShell {
     public onclear: () => void;
 
     /**
-     * Registers a function invoked when an abort signal
+     * Registers a function invoked when an abort signal is triggered
      */
     public onexit: () => void;
 
@@ -244,10 +244,10 @@ declare class ViteShell {
     public loadState(json: string): void;
 
     /**
-     * Initializes the shell with a greeting and display the prompt
+     * Resets the shell with a greeting and displays the prompt
      * @param greeting The text to greet the user
      */
-    public init(greeting?: string): void;
+    public reset(greeting?: string): void;
 
     /**
      * Set command execution timeout beyond which the process is terminated
@@ -266,7 +266,7 @@ declare class ViteShell {
     /**
      * Aborts the current process or executing command
      */
-    public abort(reason?: unknown): void;
+    public abort(reason?: string): void;
 
     // public executeScript(script: string): Promise<void>;
 

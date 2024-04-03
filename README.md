@@ -71,6 +71,6 @@ This will generate the production-ready distribution files in the `dist` directo
 
 ## License
 
-Copyright (c) 2023 [Henry Hale](https://github.com/henryhale).
+Copyright (c) 2023-Present [Henry Hale](https://github.com/henryhale).
 
 Released under the [MIT License](https://github.com/henryhale/viteshell/blob/master/LICENSE.txt).

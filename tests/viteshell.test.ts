@@ -109,7 +109,7 @@ describe("ViteShell", () => {
         expect(shell.execute("npm")).rejects.toMatch(/inactive/g);
 
         // activate shell
-        shell.init("Hello World!\n");
+        shell.reset("Hello World!\n");
 
         // existing command
         expect(shell.execute("help")).resolves.toEqual(undefined);
@@ -123,7 +123,7 @@ describe("ViteShell", () => {
         shell.onclear = () => box.splice(0);
 
         // first initialise
-        shell.init();
+        shell.reset();
         expect(shell.env["?"]).toEqual("0");
 
         // builtin command
@@ -146,14 +146,14 @@ describe("ViteShell", () => {
 
     test("removing commands", async () => {
         // don't remove built-in commands, unless or otherwise needed
-        shell.init();
+        shell.reset();
 
         // test `help` command
         await shell.execute("help");
         expect(shell.env["?"]).toEqual("0");
 
         // remove `help` command
-        expect(() => shell.removeCommand("help")).not.toThrowError();
+        expect(() => shell.removeCommand("help")).not.toThrow();
 
         // retry `help` command
         await shell.execute("help");
