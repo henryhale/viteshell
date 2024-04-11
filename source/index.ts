@@ -290,8 +290,9 @@ export default class ViteShell implements Shell {
         );
 
         // run child process in parallel with abort signal listener and timeout handler
-        return await createAbortablePromise<void>(
-            async (resolve, reject) => {
+        const promise = createAbortablePromise(
+            controller,
+            async (signal, reject) => {
                 try {
                     // parse input
                     const commands = parseInputIntoCommands(line);
@@ -319,17 +320,16 @@ export default class ViteShell implements Shell {
                             }
                         }
                     }
-
                     // successfully executed
-                    resolve();
                 } catch (error) {
                     // handle error
-                    reject(error);
+                    reject(error!.toString());
                 }
             },
-            controller,
             this.#timeout
-        )
+        );
+
+        return promise
             .catch((error) => {
                 // print error
                 this.#output.error(error + "\n");
