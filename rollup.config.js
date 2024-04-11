@@ -14,10 +14,10 @@ const replacer = replace({
 
 const banner = `
 /**
- *  viteshell - v${pkg.version}
- *  @author Henry Hale
- *  @license MIT
- *  @url https://github.com/henryhale/viteshell
+ *  ${pkg.name} - v${pkg.version}
+ *  @author ${pkg.author.name}
+ *  @license ${pkg.license}
+ *  @url ${pkg.homepage}
  */`;
 
 function copyToDist() {

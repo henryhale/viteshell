@@ -29,11 +29,13 @@
     "url": "https://github.com/henryhale/viteshell.git"
   },
   "keywords": [
-    "shell",
-    "cli",
     "bash",
+    "cli",
     "command",
     "console",
+    "executor",
+    "sh",
+    "shell",
     "terminal"
   ],
   "author": {
