@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.8.0](https://github.com/henryhale/viteshell/compare/v0.7.0...v0.8.0) (2024-04-03)
+
+
+### Features
+
+* add reimplementation of onexit method ([7a972a0](https://github.com/henryhale/viteshell/commit/7a972a0353c5c5e48a667c2eb65eeb76965fdd7b))
+* rename init method to reset ([d83d7d9](https://github.com/henryhale/viteshell/commit/d83d7d9b9bdfcce8319b4e917525317c8590ae28))
+
+
+### Bug Fixes
+
+* **bug:** gracefully terminate large timeouts when task is resolved ([6503dec](https://github.com/henryhale/viteshell/commit/6503dec80a5e3d1fd26357c2eb8c446d3b50c941))
+* **bug:** timeouts in seconds as documented ([4203cab](https://github.com/henryhale/viteshell/commit/4203cabbf9626f83e7689c79d7221e0e1f9ed91c))
+* improve OR operations and error captures ([aa4f680](https://github.com/henryhale/viteshell/commit/aa4f68014bfa18b0cf710659922f588a4f29cbdf))
+
 ## [0.7.0](https://github.com/henryhale/viteshell/compare/v0.6.11...v0.7.0) (2024-01-14)
 
 
