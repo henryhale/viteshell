@@ -21,25 +21,27 @@ export function createProcessContext(
 ): IProcess {
     let done = false;
 
+    const { signal } = controller;
+
+    signal.addEventListener("abort", () => (done = true));
+
     const stdin = {
-        readline: input.readline.bind(input)
+        readline: () => (!done ? input.readline() : Promise.resolve(""))
     };
 
     const stdout = {
         clear: () => !done && output.clear(),
         write: (data: string) => {
-            if (!done) {
-                output.write(replaceEnvVariables(state.env, data));
-            }
+            if (done) return;
+            output.write(replaceEnvVariables(state.env, data));
         },
         writeln: (data: string) => stdout.write(data + "\n")
     };
 
     const stderr = {
         write: (msg: string) => {
-            if (!done) {
-                output.error(replaceEnvVariables(state.env, msg));
-            }
+            if (done) return;
+            output.error(replaceEnvVariables(state.env, msg));
         },
         writeln: (data: string) => stderr.write(data + "\n")
     };
@@ -70,12 +72,11 @@ export function createProcessContext(
             return toNumber(state.env[EXIT_CODE_ID]);
         },
         exit: (code?: number | string) => {
-            controller.signal.addEventListener("abort", () => (done = true));
             controller.abort(code || PROCESS_TERMINATED);
         },
         onExit: (cb: (reason?: string) => void) => {
-            controller.signal.addEventListener("abort", () => {
-                cb.call(undefined, controller.signal.reason);
+            signal.addEventListener("abort", () => {
+                cb.call(undefined, signal.reason.toString());
             });
         }
     };
