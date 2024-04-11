@@ -1,6 +1,7 @@
 import { findNextCommand, matchVariable } from "../source/executor/index";
 import { createAbortablePromise } from "../source/util/index";
 import { parseInputIntoCommands } from "../source/parser/index";
+import { PROCESS_ABORTED, PROCESS_TIMED_OUT } from "../source/constants";
 
 jest.useFakeTimers();
 
@@ -97,43 +98,58 @@ describe("Next command lookup", () => {
 
 describe("Abortable promise", () => {
     let controller: AbortController;
-    let signal: AbortSignal;
 
     beforeEach(() => {
         controller = new AbortController();
-        signal = controller.signal;
     });
 
     test("creating promises", () => {
-        expect(createAbortablePromise(() => 1, controller)).toBeInstanceOf(
-            Promise
-        );
         expect(
-            createAbortablePromise((resolve) => resolve(1), controller)
-        ).resolves.toEqual(1);
+            createAbortablePromise(controller, async () => void 0)
+        ).toBeInstanceOf(Promise);
     });
 
     test("errors", () => {
         expect(
-            createAbortablePromise(() => {
-                throw new Error("some error");
-            }, controller)
+            createAbortablePromise(
+                controller,
+                async (_, reject): Promise<void> => {
+                    try {
+                        throw new Error("some error");
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+            )
         ).rejects.toBeInstanceOf(Error);
     });
 
     test("manually aborted", async () => {
         expect(
-            createAbortablePromise((resolve) => {
-                const id = setTimeout(() => {
-                    resolve("success");
-                }, 1500);
-                signal.addEventListener("abort", () => clearTimeout(id));
-            }, controller)
-        ).rejects.toMatch(/aborted/g);
+            createAbortablePromise(controller, (signal) => {
+                return new Promise<void>((resolve) => {
+                    const id = setTimeout(() => resolve(), 1500);
+                    signal.addEventListener("abort", () => clearTimeout(id));
+                });
+            })
+        ).rejects.toMatch(PROCESS_ABORTED);
         setTimeout(() => controller.abort(), 500);
     });
 
-    // TODO
-    // test("timed promise", () => {
-    // });
+    test("timed promise", () => {
+        expect(
+            createAbortablePromise(
+                controller,
+                (signal) => {
+                    return new Promise<void>((resolve) => {
+                        const id = setTimeout(() => resolve(), 1000);
+                        signal.addEventListener("abort", () =>
+                            clearTimeout(id)
+                        );
+                    });
+                },
+                500
+            )
+        ).rejects.toMatch(PROCESS_TIMED_OUT);
+    });
 });
