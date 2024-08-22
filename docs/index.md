@@ -116,12 +116,16 @@ The shell's alias object can be accessed using `vsh.alias`.
 **Example:** set `print` as another name of the `echo` command
 
 ```js
+vsh.alias.print = "echo";
+// or
 vsh.alias["print"] = "echo";
 ```
 
 **Example:** unset `print` alias
 
 ```js
+vsh.alias.print = undefined;
+// or
 delete vsh.alias["print"];
 ```
 
@@ -137,13 +141,13 @@ These variables are stored in the `vsh.env` object.
 **Example:** changing the default prompt `PS1` to `# `
 
 ```js
-vsh.env["PS1"] = "# ";
+vsh.env.PS1 = "# ";
 ```
 
 **Example:** a compound variable (contains other variables)
 
 ```js
-vsh.env["PS1"] = "$USERNAME@$HOSTNAME # ";
+vsh.env.PS1 = "$USERNAME@$HOSTNAME # ";
 ```
 
 There exists `export` [built-in command](#builtin-commands) for setting and displaying these variables.
@@ -232,19 +236,19 @@ const list = vsh.listCommands();
 
     _export [-p] [name=[value] ... ]_ - Set shell variables by name and value
 
-    Example: `export -p` to display all variables, `export ANSWER=123` to assign `123` to `ANSWER` variable  
+    Example: `export -p` to display all variables, `export ANSWER=123` to assign `123` to `ANSWER` variable
 
 -   history
 
     _history [-c] [-n]_ - Retrieve previous input entries
 
-    Example: `history -c` to clear the history list, `history -n` to display the number of items in the history list  
+    Example: `history -c` to clear the history list, `history -n` to display the number of items in the history list
 
 -   help
 
     _help [command]_ - Displays information on available commands.
 
-    Example: `help` to display all commands,  `help clear` to show a manual of the `clear` command 
+    Example: `help` to display all commands,  `help clear` to show a manual of the `clear` command
 
 -   read
 
@@ -256,16 +260,16 @@ const list = vsh.listCommands();
 
     _sleep [seconds]_ - Delay for a specified amount of time (in seconds).
 
-    Example: `sleep 3` to pause the shell for `3` seconds 
+    Example: `sleep 3` to pause the shell for `3` seconds
 
 -   grep
 
     _grep [keyword] [context ...]_ - Searches for matching phrases in the text
 
-    Example: `help | grep clear` to capture all occurences of `clear` in the output of the `help` command 
+    Example: `help | grep clear` to capture all occurences of `clear` in the output of the `help` command
 
 -   date
-    
+
     _date_ - Displays the current time and date
 
 ### Custom Commands
@@ -302,7 +306,7 @@ You need a terminal interface for inputting textual commands and outputting data
 Below is a generic setup to register callback functions for output handling and shell termination.
 
 ```js
-// triggered when outputting data 
+// triggered when outputting data
 vsh.onoutput = (data) => {
     /* print data */
 };
