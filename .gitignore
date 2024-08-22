@@ -33,3 +33,6 @@ out
 
 # Rollup build output
 dist
+
+# NPM config
+.npmrc
