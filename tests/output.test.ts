@@ -1,20 +1,20 @@
-import OutputStream from "../source/streams/output";
+import OutputStream from '../source/streams/output';
 
-describe("Output stream", () => {
+describe('Output stream', () => {
     let stdout: OutputStream;
 
     beforeEach(() => {
         stdout = new OutputStream();
     });
 
-    test("initialization", () => {
+    test('initialization', () => {
         expect(stdout).toBeDefined();
 
-        expect(stdout).toHaveProperty("write");
-        expect(stdout).toHaveProperty("error");
-        expect(stdout).toHaveProperty("clear");
-        expect(stdout).toHaveProperty("reset");
-        expect(stdout).toHaveProperty("extract");
+        expect(stdout).toHaveProperty('write');
+        expect(stdout).toHaveProperty('error');
+        expect(stdout).toHaveProperty('clear');
+        expect(stdout).toHaveProperty('reset');
+        expect(stdout).toHaveProperty('extract');
 
         expect(stdout.bufferOutput).toBeFalsy();
         expect(stdout.onclear).toBeUndefined();
@@ -22,7 +22,7 @@ describe("Output stream", () => {
         expect(stdout.onoutput).toBeUndefined();
     });
 
-    test("usage", () => {
+    test('usage', () => {
         // terminal output
         const box: (string | number)[] = [];
 
@@ -30,19 +30,19 @@ describe("Output stream", () => {
         stdout.onerror = (msg) => box.push(msg);
         stdout.onclear = () => box.splice(0);
 
-        expect(stdout.write("hello world 1")).toBeUndefined();
+        expect(stdout.write('hello world 1')).toBeUndefined();
         expect(box.length).toEqual(1);
 
         expect(stdout.extract).toEqual([]);
 
         stdout.bufferOutput = true;
 
-        stdout.write("hello dev!");
+        stdout.write('hello dev!');
         expect(box.length).toEqual(1);
 
-        expect(stdout.extract).toEqual(["hello dev!"]);
+        expect(stdout.extract).toEqual(['hello dev!']);
 
-        stdout.write("hello world 2");
+        stdout.write('hello world 2');
 
         // reset flushs the output buffer
         stdout.reset();

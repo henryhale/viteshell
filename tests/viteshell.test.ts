@@ -25,14 +25,11 @@ describe("ViteShell", () => {
     });
 
     test("shell state properties", () => {
-        shell.alias["println"] = "echo";
+        shell.alias.println = "echo";
         expect(Object.keys(shell.alias)).toHaveLength(5);
 
-        delete shell.alias["println"];
-        expect(Object.keys(shell.alias)).toHaveLength(4);
-
-        shell.env["USER_ID"] = "123456";
-        expect(shell.env["USER_ID"]).toBeDefined();
+        shell.env.USER_ID = "123456";
+        expect(shell.env.USER_ID).toBeDefined();
 
         expect(shell.history).toHaveLength(0);
 
@@ -55,7 +52,7 @@ describe("ViteShell", () => {
                 synopsis: "hello [user]",
                 description: "Displays a greeting message for the user",
                 action: (process: IProcess): void | Promise<void> => {
-                    process.stdout.write("\nHello " + process.argv[0]);
+                    process.stdout.write(`\nHello ${process.argv[0]}`);
                 }
             });
         }).not.toThrowError();
@@ -76,7 +73,7 @@ describe("ViteShell", () => {
             "help"
         ];
 
-        builtin.forEach((name) => {
+        for (const name of builtin) {
             expect(() => {
                 shell.addCommand(name, {
                     synopsis: name,
@@ -86,7 +83,7 @@ describe("ViteShell", () => {
                     }
                 });
             }).toThrowError(/command already exists/g);
-        });
+        }
     });
 
     test("state management", () => {

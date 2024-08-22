@@ -1,5 +1,5 @@
-import { defineEnv } from "./env";
-import type { IAlias, IEnv } from "../interface";
+import type { IAlias, IEnv } from '../interface';
+import { defineEnv } from './env';
 
 /**
  * Storable Shell State
@@ -25,7 +25,7 @@ export function defineState(): IState {
  * Create a copy of the shell's state
  */
 export function spawnState(s: IState | string): IState {
-    return JSON.parse(typeof s === "string" ? s : JSON.stringify(s));
+    return JSON.parse(typeof s === 'string' ? s : JSON.stringify(s));
 }
 
 /**

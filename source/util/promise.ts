@@ -1,4 +1,4 @@
-import { PROCESS_ABORTED, PROCESS_TIMED_OUT } from "../constants";
+import { PROCESS_ABORTED, PROCESS_TIMED_OUT } from '../constants';
 
 type ExecutableAction = (
     signal: AbortSignal,
@@ -26,7 +26,7 @@ export function createAbortablePromise(
     }
 
     return new Promise<void>((resolve, reject) => {
-        signal.addEventListener("abort", () => {
+        signal.addEventListener('abort', () => {
             clearTimeout(id);
             reject(signal.reason.toString() || PROCESS_ABORTED);
         });

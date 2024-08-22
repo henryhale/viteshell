@@ -1,6 +1,6 @@
-import { tokenize } from "./lexer";
-import { parseTokens } from "./parse";
-import type { ParsedCommand } from "./parse";
+import { tokenize } from './lexer';
+import { parseTokens } from './parse';
+import type { ParsedCommand } from './parse';
 
 /**
  * Transform input string into commands

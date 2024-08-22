@@ -1,9 +1,9 @@
 export function isFunction(fn: unknown): fn is (...args: unknown[]) => unknown {
-    return typeof fn === "function";
+    return typeof fn === 'function';
 }
 
 export function isObject(o: unknown): o is object {
-    return typeof o === "object" && o !== null;
+    return typeof o === 'object' && o !== null;
 }
 
 export function randomInt(): number {
@@ -11,6 +11,6 @@ export function randomInt(): number {
 }
 
 export function toNumber(n: unknown, fallback = 0): number {
-    const i = parseInt("" + n);
-    return isNaN(i) ? fallback : i;
+    const i = Number.parseInt(`${n}`);
+    return Number.isNaN(i) ? fallback : i;
 }

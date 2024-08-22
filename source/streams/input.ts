@@ -1,5 +1,5 @@
-import { isFunction } from "../helpers";
-import type { StandardInput } from "../interface";
+import { isFunction } from '../helpers';
+import type { StandardInput } from '../interface';
 
 /**
  * Input stream
@@ -24,7 +24,7 @@ export default class InputStream implements StandardInput {
     /**
      * Saves input data into a queue (buffer)
      */
-    public insert(data = ""): void {
+    public insert(data = ''): void {
         this.buffer.push(data);
         if (isFunction(this.extractor)) {
             this.extractor.call(undefined);
@@ -35,7 +35,7 @@ export default class InputStream implements StandardInput {
      * Retrieves the data at the front of the queue (buffer)
      */
     private get extract(): string {
-        return this.buffer.shift()?.trim() || "";
+        return this.buffer.shift()?.trim() || '';
     }
 
     /**

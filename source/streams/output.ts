@@ -1,4 +1,4 @@
-import type { OutputData, OutputType } from "../interface";
+import type { OutputData, OutputType } from '../interface';
 
 /**
  * Output stream
@@ -44,17 +44,16 @@ export default class OutputStream {
      *
      * The data is buffered incase of piping.
      */
-    public write(data: OutputData, type: OutputType = "data"): void {
+    public write(data: OutputData, type: OutputType = 'data'): void {
         if (!this.isActive) {
             return;
         }
-        data = data?.toString();
         if (this.bufferOutput) {
-            this.buffer.push({ type, data });
+            this.buffer.push({ type, data: `${data}` });
         } else {
-            (type == "data" ? this.onoutput : this.onerror)?.call(
+            (type === 'data' ? this.onoutput : this.onerror)?.call(
                 undefined,
-                data
+                `${data}`
             );
         }
     }
@@ -63,14 +62,14 @@ export default class OutputStream {
      * Output error messages
      */
     public error(msg: OutputData): void {
-        this.write(msg, "error");
+        this.write(msg, 'error');
     }
 
     /**
      * Retrieves the data from the buffer leaving it empty
      */
     public get extract(): string[] {
-        return this.buffer.splice(0).map((v) => v.data + "");
+        return this.buffer.splice(0).map((v) => `${v.data}`);
     }
 
     /**
@@ -79,9 +78,10 @@ export default class OutputStream {
     public flush(): void {
         this.bufferOutput = false;
         if (this.buffer.length) {
-            this.buffer.splice(0).forEach((d) => {
+            const data = this.buffer.splice(0);
+            for (const d of data) {
                 this.write(d.data, d.type);
-            });
+            }
         }
     }
 

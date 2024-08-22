@@ -1,17 +1,5 @@
-import InputStream from "./streams/input";
-import OutputStream from "./streams/output";
-import type Shell from "./interface";
-import { replaceEnvVariables } from "./state/env";
-import { isFunction, randomInt } from "./helpers";
-import type {
-    IAlias,
-    ICommandName,
-    ICommandConfig,
-    ICommandLibrary,
-    IEnv,
-    IProcess,
-    OutputHandler
-} from "./interface";
+import { isCommandValid } from './commands';
+import { addBuiltinCommands, setExitHandler } from './commands/builtin';
 import {
     COMMAND_NOT_FOUND,
     EXIT_CODE_ID,
@@ -24,15 +12,27 @@ import {
     SHELL_INACTIVE,
     SHELL_NAME,
     VERSION
-} from "./constants";
-import { isCommandValid } from "./commands";
-import { addBuiltinCommands, setExitHandler } from "./commands/builtin";
-import { parseInputIntoCommands } from "./parser";
-import type { ParsedCommand } from "./parser/parse";
-import { findNextCommand } from "./executor";
-import { createProcessContext } from "./executor/process";
-import { defineState, spawnState, type IState, patchState } from "./state";
-import { createAbortablePromise } from "./util/promise";
+} from './constants';
+import { findNextCommand } from './executor';
+import { createProcessContext } from './executor/process';
+import { isFunction, randomInt } from './helpers';
+import type Shell from './interface';
+import type {
+    IAlias,
+    ICommandConfig,
+    ICommandLibrary,
+    ICommandName,
+    IEnv,
+    IProcess,
+    OutputHandler
+} from './interface';
+import { parseInputIntoCommands } from './parser';
+import type { ParsedCommand } from './parser/parse';
+import { type IState, defineState, patchState, spawnState } from './state';
+import { replaceEnvVariables } from './state/env';
+import InputStream from './streams/input';
+import OutputStream from './streams/output';
+import { createAbortablePromise } from './util/promise';
 
 /**
  * ViteShell
@@ -140,14 +140,14 @@ export default class ViteShell implements Shell {
     }
 
     #prompt() {
-        this.env[RANDOM_ID] = "" + randomInt();
+        this.env[RANDOM_ID] = `${randomInt()}`;
         this.#output.reset();
         this.#output.write(
             replaceEnvVariables(this.env, this.env[PROMPT_STYLE_ID])
         );
     }
 
-    public reset(greeting = ""): void {
+    public reset(greeting = ''): void {
         this.#active = true;
 
         this.#input.reset();
@@ -155,15 +155,15 @@ export default class ViteShell implements Shell {
         this.#output.clear();
 
         if (greeting) {
-            greeting = replaceEnvVariables(this.env, greeting + "\n");
-            this.#output.write(greeting);
+            const message = replaceEnvVariables(this.env, `${greeting}\n`);
+            this.#output.write(message);
         }
 
         this.#prompt();
     }
 
     public setExecutionTimeout(value: number): void {
-        if (typeof value === "number" && value > MIN_TIMEOUT) {
+        if (typeof value === 'number' && value > MIN_TIMEOUT) {
             this.#timeout = value * 1000;
         } else {
             throw new TypeError(`${SHELL_NAME}: invalid value for timeout.`);
@@ -172,7 +172,7 @@ export default class ViteShell implements Shell {
 
     async #execvp(c: ParsedCommand, p: IProcess): Promise<void> {
         // error message;
-        let errorMsg = "";
+        let errorMsg = '';
 
         const next = async () => {
             // look for next executable command in the chain basing on exit status
@@ -181,7 +181,7 @@ export default class ViteShell implements Shell {
                 if (nxt) {
                     if (errorMsg.length) {
                         p.stderr.writeln(errorMsg);
-                        errorMsg = "";
+                        errorMsg = '';
                     }
                     await this.#execvp(nxt, p);
                 }
@@ -195,10 +195,10 @@ export default class ViteShell implements Shell {
         // first check for alias - less parsing priority
         const alias = this.alias[c.cmd];
         if (alias) {
-            const args = alias.split(" ");
-            c.cmd = args.shift() || "";
+            const args = alias.split(' ');
+            c.cmd = args.shift() || '';
             if (args.length) c.argv.unshift(...args);
-            c.args = (c.cmd + " " + c.argv.join(" ")).trim();
+            c.args = `${c.cmd} ${c.argv.join(' ')}`.trim();
         }
 
         // fetch command
@@ -206,27 +206,27 @@ export default class ViteShell implements Shell {
 
         // check if command is defined
         if (!command) {
-            errorMsg = c.cmd + ": " + COMMAND_NOT_FOUND;
+            errorMsg = `${c.cmd}: ${COMMAND_NOT_FOUND}`;
             return await next();
         }
 
         // update the process object
         p.cmd = c.cmd;
         p.argv = c.argv;
-        p.env[RANDOM_ID] = "" + randomInt();
+        p.env[RANDOM_ID] = `${randomInt()}`;
 
         // whether to buffer the output or not
         this.#output.bufferOutput = c.PIPE !== undefined;
 
         try {
             // deactivate shell on `exit` command
-            if (c.cmd === "exit") {
+            if (c.cmd === 'exit') {
                 this.#active = false;
             }
             // execute command handler
             await command.action.call(undefined, p);
         } catch (error) {
-            errorMsg = c.cmd + ": " + error;
+            errorMsg = `${c.cmd}: error`;
         }
 
         // extract previous output for piped command
@@ -239,7 +239,7 @@ export default class ViteShell implements Shell {
         await next();
     }
 
-    public async execute(line: string = ""): Promise<void> {
+    public async execute(line = ''): Promise<void> {
         // check if shell is initialized
         if (!this.#active) {
             return Promise.reject(SHELL_INACTIVE);
@@ -249,25 +249,24 @@ export default class ViteShell implements Shell {
         if (this.#input.isBusy) {
             this.#input.insert(line);
             return Promise.resolve();
-        } else {
-            // otherwise clear the input buffer and any input callback
-            this.#input.reset();
         }
+        // otherwise clear the input buffer and any input callback
+        this.#input.reset();
 
         // flush the output stream and then activate it
         this.#output.reset();
 
         // check if the line contains characters
-        if (typeof line !== "string" || !line.trim()) {
+        if (typeof line !== 'string' || !line.trim()) {
             this.#prompt();
             return Promise.resolve();
         }
 
-        line = line.trim();
+        const trimmedLine = line.trim();
 
         // add input to history, no consecutive duplicates
-        if (line != this.history.at(-1)) {
-            this.history.push(line);
+        if (trimmedLine !== this.history.at(-1)) {
+            this.history.push(trimmedLine);
         }
 
         // fork current state
@@ -277,7 +276,7 @@ export default class ViteShell implements Shell {
         const controller = new AbortController();
         const signal = controller.signal;
         this.#abortController = controller;
-        signal.addEventListener("abort", () => {
+        signal.addEventListener('abort', () => {
             this.#input.reset();
         });
 
@@ -295,7 +294,7 @@ export default class ViteShell implements Shell {
             async (signal, reject) => {
                 try {
                     // parse input
-                    const commands = parseInputIntoCommands(line);
+                    const commands = parseInputIntoCommands(trimmedLine);
 
                     for (const command of commands) {
                         // prevent unnecessary runs
@@ -313,7 +312,7 @@ export default class ViteShell implements Shell {
                         } catch (error) {
                             if (commands.length > 1) {
                                 // only print error and continue to the next command
-                                process.stderr.write(error + "\n");
+                                process.stderr.write(`${error}\n}`);
                                 spawnedState.env[EXIT_CODE_ID] = EXIT_FAILURE;
                             } else {
                                 throw error;
@@ -323,7 +322,7 @@ export default class ViteShell implements Shell {
                     // successfully executed
                 } catch (error) {
                     // handle error
-                    reject(error!.toString());
+                    reject(error?.toString());
                 }
             },
             this.#timeout
@@ -332,7 +331,7 @@ export default class ViteShell implements Shell {
         return promise
             .catch((error) => {
                 // print error
-                this.#output.error(error + "\n");
+                this.#output.error(`${error}\n`);
                 this.#state.env[EXIT_CODE_ID] = EXIT_FAILURE;
             })
             .finally(() => {

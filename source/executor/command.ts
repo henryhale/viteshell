@@ -1,4 +1,4 @@
-import type { ParsedCommand } from "../parser/parse";
+import type { ParsedCommand } from '../parser/parse';
 
 /**
  * Check whether the string matchs a key=value format

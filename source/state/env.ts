@@ -1,6 +1,6 @@
-import { DEFAULT_PROMPT_STYLE, EXIT_SUCCESS, SHELL_NAME } from "../constants";
-import { randomInt } from "../helpers";
-import type { IEnv } from "../interface";
+import { DEFAULT_PROMPT_STYLE, EXIT_SUCCESS, SHELL_NAME } from '../constants';
+import { randomInt } from '../helpers';
+import type { IEnv } from '../interface';
 
 /**
  * Default Environment object
@@ -14,37 +14,37 @@ const defaultEnv = {
     /**
      * The username of the current user
      */
-    USERNAME: "user",
+    USERNAME: 'user',
 
     /**
      * The device or host machine
      */
-    HOSTNAME: "web",
+    HOSTNAME: 'web',
 
     /**
      * Current working directory
      */
-    CWD: "/",
+    CWD: '/',
 
     /**
      * Prompt style 1
      */
-    PS1: "$USERNAME@$HOSTNAME: $CWD " + DEFAULT_PROMPT_STYLE,
+    PS1: `$USERNAME@$HOSTNAME: $CWD ${DEFAULT_PROMPT_STYLE}`,
 
     /**
      * Prompt style 2
      */
-    PS2: "> ",
+    PS2: '> ',
 
     /**
      * Previous exit status
      */
-    "?": EXIT_SUCCESS,
+    '?': EXIT_SUCCESS,
 
     /**
      * Random number
      */
-    RANDOM: "" + randomInt()
+    RANDOM: `${randomInt()}`
 };
 
 /**
@@ -71,12 +71,12 @@ export function defineEnv(): IEnv {
  * @param data Template string
  * @returns complete string (without variable name slots)
  */
-export function replaceEnvVariables(env: IEnv, data = ""): string {
-    let match;
-    return ("" + data).replace(/(?:\$([a-z_][a-z0-9_]+|\?))/gi, (x) => {
+export function replaceEnvVariables(env: IEnv, data = ''): string {
+    let match: string | undefined;
+    return `${data}`.replace(/(?:\$([a-z_][a-z0-9_]+|\?))/gi, (x) => {
         match = env[x.slice(1)];
-        if (typeof match === "undefined") {
-            return "";
+        if (typeof match === 'undefined') {
+            return '';
         }
         return match.toString();
     });

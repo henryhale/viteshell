@@ -14,7 +14,7 @@ export type IEnv = {
     PWD: string;
     PS1: string;
     PS2: string;
-    "?": string;
+    '?': string;
     RANDOM: string;
     [key: string]: string | undefined;
 };
@@ -40,7 +40,7 @@ export type OutputData = string | number;
 
 export type OutputHandler = (data: string) => void;
 
-export type OutputType = "error" | "data";
+export type OutputType = 'error' | 'data';
 
 /**
  * STDERR interface

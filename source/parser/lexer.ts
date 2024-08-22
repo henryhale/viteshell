@@ -1,7 +1,7 @@
 /**
  * Tokens that define the start/end of a command
  */
-export const delimiters = [";", "|", "&&", "||"];
+export const delimiters = [';', '|', '&&', '||'];
 
 /**
  * Parse raw input into tokens
@@ -16,7 +16,7 @@ export const delimiters = [";", "|", "&&", "||"];
 export function tokenize(str: string): string[][] {
     const res: string[][] = [];
 
-    if (!str || typeof str !== "string") return res;
+    if (!str || typeof str !== 'string') return res;
 
     const tmp: string[] = [];
 
@@ -24,15 +24,19 @@ export function tokenize(str: string): string[][] {
     let dQuoted = false;
     let backSlash = false;
     let notEmpty = false;
-    let buffer = "";
+    let buffer = '';
 
     let char!: string;
 
-    if (delimiters.some((d) => str.startsWith((char = d)) || str.endsWith(d))) {
-        throw new SyntaxError("unexpected token '" + char + "'");
+    const checkForDelimiters = delimiters.some((d) => {
+        char = d;
+        return str.startsWith(d) || str.endsWith(d);
+    });
+    if (checkForDelimiters) {
+        throw new SyntaxError(`unexpected token '${char}'`);
     }
 
-    str.split("").forEach((v, i, s) => {
+    str.split('').forEach((v, i, s) => {
         if (sQuoted && v === `'`) {
             sQuoted = false;
             notEmpty = true;
@@ -47,19 +51,19 @@ export function tokenize(str: string): string[][] {
                 dQuoted = true;
                 return;
             }
-            if (v === "\\") {
+            if (v === '\\') {
                 backSlash = true;
                 return;
             }
-            if (["\b", "\f", "\n", "\r", "\t", " ", ";"].includes(v)) {
+            if (['\b', '\f', '\n', '\r', '\t', ' ', ';'].includes(v)) {
                 if (buffer.length > 0 || notEmpty) {
                     tmp.push(buffer);
                     notEmpty = false;
                 }
-                if (v === ";" && tmp.length) {
+                if (v === ';' && tmp.length) {
                     res.push(tmp.splice(0));
                 }
-                buffer = "";
+                buffer = '';
                 return;
             }
         }
@@ -68,9 +72,9 @@ export function tokenize(str: string): string[][] {
             notEmpty = true;
             return;
         }
-        if (!sQuoted && dQuoted && !backSlash && v === "\\") {
+        if (!sQuoted && dQuoted && !backSlash && v === '\\') {
             backSlash = true;
-            if (['"', "`", "$", "\\"].includes(s[i + 1])) {
+            if (['"', '`', '$', '\\'].includes(s[i + 1])) {
                 return;
             }
         }
@@ -89,14 +93,14 @@ export function tokenize(str: string): string[][] {
 
     if (dQuoted)
         throw new SyntaxError(
-            "unexpected end of string while looking for matching double quote"
+            'unexpected end of string while looking for matching double quote'
         );
     if (sQuoted)
         throw new SyntaxError(
-            "unexpected end of string while looking for matching single quote"
+            'unexpected end of string while looking for matching single quote'
         );
     if (backSlash)
-        throw new SyntaxError("unexpected end of string right after slash");
+        throw new SyntaxError('unexpected end of string right after slash');
 
     return res;
 }

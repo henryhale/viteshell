@@ -1,5 +1,5 @@
-import { isFunction, isObject } from "../helpers";
-import type { ICommandConfig } from "../interface";
+import { isFunction, isObject } from '../helpers';
+import type { ICommandConfig } from '../interface';
 
 /**
  * Determine if the command configuration is right

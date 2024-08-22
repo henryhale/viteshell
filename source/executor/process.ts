@@ -1,10 +1,10 @@
-import { EXIT_CODE_ID, PROCESS_TERMINATED, VERSION } from "../constants";
-import { toNumber } from "../helpers";
-import type { IProcess } from "../interface";
-import type { IState } from "../state";
-import { replaceEnvVariables } from "../state/env";
-import InputStream from "../streams/input";
-import OutputStream from "../streams/output";
+import { EXIT_CODE_ID, PROCESS_TERMINATED, VERSION } from '../constants';
+import { toNumber } from '../helpers';
+import type { IProcess } from '../interface';
+import type { IState } from '../state';
+import { replaceEnvVariables } from '../state/env';
+import type InputStream from '../streams/input';
+import type OutputStream from '../streams/output';
 
 /**
  * Every child process has its own execution context that
@@ -23,10 +23,12 @@ export function createProcessContext(
 
     const { signal } = controller;
 
-    signal.addEventListener("abort", () => (done = true));
+    signal.addEventListener('abort', () => {
+        done = true;
+    });
 
     const stdin = {
-        readline: () => (!done ? input.readline() : Promise.resolve(""))
+        readline: () => (!done ? input.readline() : Promise.resolve(''))
     };
 
     const stdout = {
@@ -35,7 +37,7 @@ export function createProcessContext(
             if (done) return;
             output.write(replaceEnvVariables(state.env, data));
         },
-        writeln: (data: string) => stdout.write(data + "\n")
+        writeln: (data: string) => stdout.write(`${data}\n`)
     };
 
     const stderr = {
@@ -43,12 +45,12 @@ export function createProcessContext(
             if (done) return;
             output.error(replaceEnvVariables(state.env, msg));
         },
-        writeln: (data: string) => stderr.write(data + "\n")
+        writeln: (data: string) => stderr.write(`${data}\n`)
     };
 
     return {
-        cmd: "",
-        args: "",
+        cmd: '',
+        args: '',
         argv: [],
         get env() {
             return state.env;
@@ -75,7 +77,7 @@ export function createProcessContext(
             controller.abort(code || PROCESS_TERMINATED);
         },
         onExit: (cb: (reason?: string) => void) => {
-            signal.addEventListener("abort", () => {
+            signal.addEventListener('abort', () => {
                 cb.call(undefined, signal.reason.toString());
             });
         }
